@@ -91,4 +91,7 @@ secrets/
 credentials/
 
 prompts/
+docs/
 git_doc.md
+CLAUDE.md
+task.md
