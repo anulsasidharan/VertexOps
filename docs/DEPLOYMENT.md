@@ -60,12 +60,19 @@ docker compose down -v          # stop and remove volumes
 
 #### Service inventory
 
-| Service | Container name | Image | Host port | Role |
-|---------|----------------|-------|-----------|------|
-| `api` | `vertexops_api` | built from `Dockerfile` | `8000` | FastAPI + Uvicorn |
-| `postgres` | `vertexops_postgres` | `postgres:16-alpine` | `5432` | Metadata DB |
-| `redis` | `vertexops_redis` | `redis:7-alpine` | `6379` | Broker + rate-limit cache |
-| `worker` | — | same image, different CMD | — | Celery (added in Task #31) |
+| Service | Container name | Image | Host port | Profile | Role |
+|---------|----------------|-------|-----------|---------|------|
+| `api` | `vertexops_api` | built from `Dockerfile` | `8000` | _(default)_ | FastAPI + Uvicorn |
+| `postgres` | `vertexops_postgres` | `postgres:16-alpine` | `5432` | _(default)_ | Metadata DB |
+| `redis` | `vertexops_redis` | `redis:7-alpine` | `6379` | _(default)_ | Broker + rate-limit cache |
+| `worker` | `vertexops_worker` | same image as `api` | — | `worker` | Celery background tasks (queues wired in Task #18) |
+
+The `worker` service uses a Docker Compose [profile](https://docs.docker.com/compose/profiles/) so it
+is **not** started by default. Start it explicitly when needed:
+
+```bash
+docker compose --profile worker up -d worker
+```
 
 > **Production note:** avoid publishing `5432` / `6379` in production compose
 > overlays. Use an internal network and keep the DB/Redis ports private.
@@ -74,11 +81,12 @@ docker compose down -v          # stop and remove volumes
 
 | Context | `DATABASE_URL` | `REDIS_URL` |
 |---------|----------------|-------------|
-| **Host machine** (IDE / CLI) | `postgresql+asyncpg://<user>:<password>@localhost:5432/<database>` | `redis://localhost:6379/0` |
-| **Container-to-container** | `postgresql+asyncpg://<user>:<password>@postgres:5432/<database>` | `redis://redis:6379/0` |
+| **Host machine** (IDE / CLI) | `postgresql+asyncpg://vertexops:vertexops@localhost:5432/vertexops` | `redis://localhost:6379/0` |
+| **Container-to-container** | `postgresql+asyncpg://vertexops:vertexops@postgres:5432/vertexops` | `redis://redis:6379/0` |
 
-The `api` service automatically overrides these via `docker-compose.yml`
-environment block so `.env` host-side values are not needed inside containers.
+The `api` and `worker` services override these automatically via the
+`x-app-env` YAML anchor in `docker-compose.yml`; host-side `.env` values
+are not needed inside containers.
 
 ---
 
