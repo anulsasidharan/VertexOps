@@ -37,6 +37,10 @@ ENV/
 .cursor/
 
 # Google Cloud credentials
+# Google Cloud
+*.json
+!package.json
+!package-lock.json
 service-account*.json
 gcloud-credentials*.json
 application_default_credentials.json
@@ -52,6 +56,7 @@ application_default_credentials.json
 logs/
 
 # Testing & coverage
+# Testing & Coverage
 .coverage
 .pytest_cache/
 htmlcov/
@@ -72,6 +77,12 @@ dmypy.json
 node_modules/
 frontend/dist/
 frontend/.env
+# Jupyter Notebooks
+.ipynb_checkpoints/
+*.ipynb
+
+# Docker
+.dockerignore
 
 # OS
 .DS_Store
@@ -83,8 +94,19 @@ desktop.ini
 *.tar.gz
 
 # Secrets / keys
+# Distribution / packaging
+*.whl
+*.tar.gz
+
+# Local secrets / keys
 *.pem
 *.key
 *.p12
 secrets/
 credentials/
+
+prompts/
+docs/
+git_doc.md
+CLAUDE.md
+task.md
