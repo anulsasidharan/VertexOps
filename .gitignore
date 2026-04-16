@@ -82,7 +82,7 @@ frontend/.env
 *.ipynb
 
 # Docker
-.dockerignore
+# .dockerignore is intentionally tracked — do not add it here
 
 # OS
 .DS_Store

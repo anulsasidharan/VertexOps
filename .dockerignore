@@ -1,0 +1,59 @@
+# Version control
+.git
+.gitignore
+
+# Python caches and build artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+*.egg
+dist/
+build/
+.eggs/
+*.whl
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Test and coverage artifacts
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Secrets — never bake into the image
+.env
+.env.*
+!.env.example
+
+# Local development infrastructure
+docker-compose.yml
+docker-compose*.yml
+
+# Editor and OS files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Documentation (not needed at runtime)
+docs/
+*.md
+!README.md
+
+# Frontend (separate image if needed)
+frontend/
+node_modules/
+
+# Terraform / k8s / deploy configs
+terraform/
+k8s/
+deploy/
