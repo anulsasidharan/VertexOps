@@ -36,6 +36,7 @@ ENV/
 *.swo
 .cursor/
 
+# Google Cloud credentials
 # Google Cloud
 *.json
 !package.json
@@ -54,6 +55,7 @@ application_default_credentials.json
 *.log
 logs/
 
+# Testing & coverage
 # Testing & Coverage
 .coverage
 .pytest_cache/
@@ -67,6 +69,14 @@ coverage.xml
 .dmypy.json
 dmypy.json
 
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Node / frontend
+node_modules/
+frontend/dist/
+frontend/.env
 # Jupyter Notebooks
 .ipynb_checkpoints/
 *.ipynb
@@ -79,6 +89,11 @@ dmypy.json
 Thumbs.db
 desktop.ini
 
+# Distribution
+*.whl
+*.tar.gz
+
+# Secrets / keys
 # Distribution / packaging
 *.whl
 *.tar.gz

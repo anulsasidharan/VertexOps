@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pip install *)",
+      "Bash(python -c \"from backend.main import app; print\\('App boots OK —', app.title\\)\")"
+    ]
+  }
+}
