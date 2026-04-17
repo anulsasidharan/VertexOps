@@ -33,8 +33,8 @@ and `docs/LDL.md`.
 
 | Phase | Goal | Primary Blocking Output | Parallel Lanes | Status |
 |------|------|--------------------------|----------------|--------|
-| 1 | Bootstrap repo structure and runtime | App skeleton, config, local infra | Tasks 2-4 after Task 1 | Phase 1, Task 1 Completed |
-| 2 | Establish DB, auth, and API base | Schema, auth, health, rate limits | Tasks 6-9 after Task 5 | Not Started |
+| 1 | Bootstrap repo structure and runtime | App skeleton, config, local infra | Tasks 2-4 after Task 1 | ✅ Complete (Tasks 1-4) |
+| 2 | Establish DB, auth, and API base | Schema, auth, health, rate limits | Tasks 6-9 after Task 5 | In Progress (Task 5 ✅) |
 | 3 | Build ingest to index pipeline | Upload, chunk, embed, vector indexing, workers | Tasks 12-17 after Task 11 | Not Started |
 | 4 | Deliver RAG query capabilities | Retrieval, generation, citations, realtime | Tasks 21-24 after Task 20 | Not Started |
 | 5 | Add experiments and optimization loop | Experiment runs, eval reports, orchestrator | Tasks 27-30 after Task 26 | Not Started |
@@ -46,7 +46,7 @@ and `docs/LDL.md`.
 
 ## Phase 1 - Foundation and Project Skeleton
 
-## Task #1: Repository Application Skeleton
+## Task #1: Repository Application Skeleton ✅
 - **Branch:** `feature/app-skeleton`
 - **Dependencies:** None
 - **Parallelizable With:** None
@@ -59,7 +59,7 @@ and `docs/LDL.md`.
 - **Files/Modules Affected:** `backend/`, `frontend/`, `tests/`, `pyproject.toml`, `requirements*.txt`
 - **Estimated Complexity:** Medium
 
-## Task #2: Environment Configuration and Settings Loader
+## Task #2: Environment Configuration and Settings Loader ✅
 - **Branch:** `feature/settings-and-env`
 - **Dependencies:** 1
 - **Parallelizable With:** 3, 4
@@ -72,7 +72,7 @@ and `docs/LDL.md`.
 - **Files/Modules Affected:** `backend/core/config.py`, `.env.example`, `backend/core/`
 - **Estimated Complexity:** Low
 
-## Task #3: Local Infrastructure Bootstrap
+## Task #3: Local Infrastructure Bootstrap ✅
 - **Branch:** `feature/local-dev-infra`
 - **Dependencies:** 1
 - **Parallelizable With:** 2, 4
@@ -85,7 +85,7 @@ and `docs/LDL.md`.
 - **Files/Modules Affected:** `docker-compose.yml`, `Dockerfile`, `.dockerignore`, `docs/DEPLOYMENT.md`
 - **Estimated Complexity:** Medium
 
-## Task #4: Shared Logging, Exceptions, and Request Context
+## Task #4: Shared Logging, Exceptions, and Request Context ✅
 - **Branch:** `feature/core-logging-and-errors`
 - **Dependencies:** 1
 - **Parallelizable With:** 2, 3
@@ -104,7 +104,7 @@ and `docs/LDL.md`.
 
 ## Phase 2 - Data Model and Security Foundation
 
-## Task #5: Database Engine, Session Management, and Alembic Setup
+## Task #5: Database Engine, Session Management, and Alembic Setup ✅
 - **Branch:** `feature/db-foundation`
 - **Dependencies:** 2, 3, 4
 - **Parallelizable With:** None

@@ -1,1 +1,5 @@
-"""SQLAlchemy ORM models — added per schema tasks (Tasks #6-8)."""
+"""SQLAlchemy ORM models."""
+
+from backend.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
+
+__all__ = ["Base", "TimestampMixin", "UUIDPrimaryKeyMixin"]
