@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from backend.api.v1 import router as v1_router
 from backend.core.config import get_settings
+from backend.core.db import dispose_engine, init_engine
 from backend.core.exceptions import VertexOpsError
 from backend.core.logging import configure_logging
 from backend.core.middleware import (
@@ -23,9 +24,9 @@ async def lifespan(app: FastAPI):
     """Application lifespan: startup and shutdown hooks."""
     settings = get_settings()
     configure_logging(settings.log_level)
-    # Future: initialise DB pool, Redis, telemetry
+    await init_engine()
     yield
-    # Future: close DB pool, Redis connections
+    await dispose_engine()
 
 
 def create_app() -> FastAPI:

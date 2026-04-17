@@ -1,1 +1,5 @@
-"""Repository layer — data access per aggregate (Tasks #6-8)."""
+"""Repository layer — data access per aggregate."""
+
+from backend.repositories.base import BaseRepository
+
+__all__ = ["BaseRepository"]
