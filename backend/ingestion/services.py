@@ -1,4 +1,4 @@
-"""Document service — orchestrates repository and storage operations."""
+"""Ingestion services — document CRUD and file parsing/deduplication."""
 
 import uuid
 from typing import List, Optional, Tuple
@@ -6,6 +6,8 @@ from typing import List, Optional, Tuple
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.core.exceptions import ForbiddenError, NotFoundError
+from backend.ingestion.hashing import compute_content_hash
+from backend.ingestion.loaders import ParsedDocument, get_loader
 from backend.ingestion.schemas import (
     CompleteUploadRequest,
     DocumentRegisterRequest,
@@ -113,3 +115,44 @@ class DocumentService:
         if doc.workspace_id != workspace_id:
             raise ForbiddenError("Document does not belong to this workspace.")
         return doc
+
+
+# ---------------------------------------------------------------------------
+# ParseService — file parsing, metadata extraction, and deduplication
+# ---------------------------------------------------------------------------
+
+
+class ParseService:
+    """Parse raw file bytes and support content-hash deduplication."""
+
+    def parse(
+        self,
+        content: bytes,
+        filename: str,
+        content_type: Optional[str] = None,
+    ) -> ParsedDocument:
+        """Return a ParsedDocument by dispatching to the appropriate loader.
+
+        Raises ValueError when no loader supports the file type.
+        """
+        loader = get_loader(filename, content_type)
+        return loader.load(content, filename)
+
+    def hash(self, content: bytes) -> str:
+        """Return the SHA-256 hex digest of *content*."""
+        return compute_content_hash(content)
+
+    async def find_duplicate(
+        self,
+        session: AsyncSession,
+        workspace_id: uuid.UUID,
+        content_hash: str,
+    ) -> Optional["Document"]:
+        """Return an existing Document in *workspace_id* with *content_hash*, or None."""
+        from backend.repositories.document_repository import DocumentRepository
+
+        repo = DocumentRepository(session)
+        doc = await repo.get_by_content_hash(content_hash)
+        if doc is not None and doc.workspace_id == workspace_id:
+            return doc
+        return None

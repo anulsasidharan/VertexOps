@@ -35,7 +35,7 @@ and `docs/LDL.md`.
 |------|------|--------------------------|----------------|--------|
 | 1 | Bootstrap repo structure and runtime | App skeleton, config, local infra | Tasks 2-4 after Task 1 | ✅ Complete (Tasks 1-4) |
 | 2 | Establish DB, auth, and API base | Schema, auth, health, rate limits | Tasks 6-9 after Task 5 | ✅ Complete (Tasks 5-10) |
-| 3 | Build ingest to index pipeline | Upload, chunk, embed, vector indexing, workers | Tasks 12-17 after Task 11 | In Progress (Tasks 11-12 ✅) |
+| 3 | Build ingest to index pipeline | Upload, chunk, embed, vector indexing, workers | Tasks 12-17 after Task 11 | In Progress (Tasks 11-13 ✅) |
 | 4 | Deliver RAG query capabilities | Retrieval, generation, citations, realtime | Tasks 21-24 after Task 20 | Not Started |
 | 5 | Add experiments and optimization loop | Experiment runs, eval reports, orchestrator | Tasks 27-30 after Task 26 | Not Started |
 | 6 | Add UI and external product hooks | Dashboard, notifications, billing hooks | Tasks 32-35 after Task 31 | Not Started |
@@ -214,7 +214,7 @@ and `docs/LDL.md`.
 - **Files/Modules Affected:** `backend/api/v1/documents.py`, `backend/ingestion/`, `backend/repositories/`, `tests/integration/`
 - **Estimated Complexity:** Medium
 
-## Task #13: Ingestion Service for Parsing, Validation, and Deduplication
+## Task #13: Ingestion Service for Parsing, Validation, and Deduplication ✅
 - **Branch:** `feature/ingestion-service`
 - **Dependencies:** 7, 11
 - **Parallelizable With:** 12, 18
