@@ -266,7 +266,7 @@ and `docs/LDL.md`.
 - **Files/Modules Affected:** `backend/vector_store/`, `backend/vector_store/providers/`, `tests/unit/`
 - **Estimated Complexity:** Medium
 
-## Task #17: Index Management API and Service
+## Task #17: Index Management API and Service ✅
 - **Branch:** `feature/index-management-api`
 - **Dependencies:** 8, 14, 15, 16
 - **Parallelizable With:** 18, 19
