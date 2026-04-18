@@ -227,7 +227,7 @@ and `docs/LDL.md`.
 - **Files/Modules Affected:** `backend/ingestion/`, `backend/ingestion/loaders/`, `backend/ingestion/services.py`, `tests/unit/`
 - **Estimated Complexity:** High
 
-## Task #14: Chunking Strategy Registry
+## Task #14: Chunking Strategy Registry ✅
 - **Branch:** `feature/chunking-strategies`
 - **Dependencies:** 13
 - **Parallelizable With:** 15, 18
