@@ -34,6 +34,7 @@ def _make_exp(**kwargs):
     exp.description = kwargs.get("description", None)
     exp.index_id = kwargs.get("index_id", None)
     exp.experiment_config = kwargs.get("experiment_config", {"top_k": 5})
+    exp.config_hash = kwargs.get("config_hash", "a" * 64)
     exp.created_at = _NOW
     exp.updated_at = _NOW
     return exp
@@ -71,6 +72,7 @@ def test_create_experiment_happy_path():
     data = resp.json()
     assert data["name"] == "test-exp"
     assert data["config"] == {"top_k": 5}
+    assert data.get("config_hash") == "a" * 64
 
 
 def test_create_experiment_no_workspace_returns_403():

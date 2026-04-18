@@ -32,6 +32,7 @@ class Experiment(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     experiment_config: Mapped[Optional[Dict[str, Any]]] = mapped_column(
         "config", JSONB, nullable=True
     )
+    config_hash: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
 
     index: Mapped[Optional["VectorIndex"]] = relationship(
         "VectorIndex",

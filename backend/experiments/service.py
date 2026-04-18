@@ -37,12 +37,14 @@ class ExperimentService:
         description: Optional[str] = None,
         index_id: Optional[uuid.UUID] = None,
     ) -> Experiment:
+        cfg = config or {}
         exp = Experiment(
             workspace_id=workspace_id,
             name=name,
             description=description,
             index_id=index_id,
-            experiment_config=config or {},
+            experiment_config=cfg,
+            config_hash=_compute_config_hash(cfg),
         )
         await self._exp_repo.add(exp)
         logger.info("Created experiment id=%s name=%r", exp.id, name)
