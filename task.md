@@ -240,7 +240,7 @@ and `docs/LDL.md`.
 - **Files/Modules Affected:** `backend/chunking/`, `backend/models/`, `tests/unit/`
 - **Estimated Complexity:** Medium
 
-## Task #15: Embedding Provider Base and OpenAI Adapter
+## Task #15: Embedding Provider Base and OpenAI Adapter ✅
 - **Branch:** `feature/embedding-openai-adapter`
 - **Dependencies:** 2, 14
 - **Parallelizable With:** 14, 16, 18
