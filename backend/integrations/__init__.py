@@ -1,1 +1,1 @@
-"""Third-party integrations (notifications, billing, etc.)."""
+"""Third-party integrations (notifications, billing usage metering, etc.)."""

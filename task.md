@@ -38,7 +38,7 @@ and `docs/LDL.md`.
 | 3 | Build ingest to index pipeline | Upload, chunk, embed, vector indexing, workers | Tasks 12-17 after Task 11 | ✅ Complete (Tasks 11-19 ✅) |
 | 4 | Deliver RAG query capabilities | Retrieval, generation, citations, realtime | Tasks 21-24 after Task 20 | ✅ Complete (Tasks 20-25 ✅) |
 | 5 | Add experiments and optimization loop | Experiment runs, eval reports, orchestrator | Tasks 27-30 after Task 26 | Complete (Tasks 26-30) |
-| 6 | Add UI and external product hooks | Dashboard, notifications, billing hooks | Tasks 32-35 after Task 31 | Not Started |
+| 6 | Add UI and external product hooks | Dashboard, notifications, billing hooks | Tasks 32-35 after Task 31 | ✅ Complete (Tasks 31-35) |
 | 7 | Make platform deployable and automatable | Metrics, containers, CI/CD, cloud envs | Tasks 37-40 after Task 36 | Not Started |
 | 8 | Finish quality bar and release docs | E2E, hardening, roadmap closeout | Tasks 41-42 after Task 40 | Not Started |
 

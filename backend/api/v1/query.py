@@ -9,6 +9,7 @@ from pydantic import BaseModel, Field
 
 from backend.api.dependencies.auth import AuthContext, get_current_user
 from backend.core.exceptions import DomainValidationError
+from backend.integrations.billing.service import record_usage_event
 from backend.generation.base import GenerationRequest
 from backend.generation.service import GenerationService
 from backend.retrieval.base import RetrievalConfig
@@ -120,6 +121,17 @@ async def query(
 
     latency_ms = (time.perf_counter() - t0) * 1000
 
+    record_usage_event(
+        "query_completion",
+        float(gen_resp.total_tokens),
+        metadata={
+            "user_id": str(auth.user_id),
+            "workspace_id": str(auth.workspace_id) if auth.workspace_id else "",
+            "index_id": str(body.index_id),
+            "auth_type": auth.auth_type,
+        },
+    )
+
     return QueryResponse(
         answer=gen_resp.answer,
         sources=[
@@ -164,6 +176,17 @@ async def rag_query(
 
     confidence = max((r.score for r in results), default=0.0)
     latency_ms = (time.perf_counter() - t0) * 1000
+
+    record_usage_event(
+        "rag_query_completion",
+        float(gen_resp.total_tokens),
+        metadata={
+            "user_id": str(auth.user_id),
+            "workspace_id": str(auth.workspace_id) if auth.workspace_id else "",
+            "index_id": str(body.index_id),
+            "auth_type": auth.auth_type,
+        },
+    )
 
     return RAGQueryResponse(
         response_text=gen_resp.answer,

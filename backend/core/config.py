@@ -112,6 +112,14 @@ class Settings(BaseSettings):
     twilio_alert_to_number: Optional[str] = None
 
     # -------------------------------------------------------------------------
+    # Billing / usage metering (Stripe) — optional, off by default (Task #35)
+    # -------------------------------------------------------------------------
+    stripe_metering_enabled: bool = False
+    stripe_api_key: Optional[SecretStr] = None
+    #: When set, overrides the logical event name sent as Stripe `event_name` (meter name).
+    stripe_meter_event_name: Optional[str] = None
+
+    # -------------------------------------------------------------------------
     # Validation
     # -------------------------------------------------------------------------
     @field_validator("cors_origins", mode="before")
