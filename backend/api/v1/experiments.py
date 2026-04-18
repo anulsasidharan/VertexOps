@@ -43,6 +43,7 @@ class ExperimentResponse(BaseModel):
     description: Optional[str] = None
     index_id: Optional[uuid.UUID] = None
     config: Dict[str, Any] = Field(default_factory=dict)
+    config_hash: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 
@@ -57,6 +58,7 @@ class ExperimentResponse(BaseModel):
             description=exp.description,
             index_id=exp.index_id,
             config=exp.experiment_config or {},
+            config_hash=getattr(exp, "config_hash", None),
             created_at=exp.created_at,
             updated_at=exp.updated_at,
         )
