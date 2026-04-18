@@ -124,6 +124,76 @@ async def run_build_index(index_id: uuid.UUID, workspace_id: uuid.UUID) -> Dict[
 
 
 async def run_eval(run_id: uuid.UUID) -> Dict[str, Any]:
-    """Placeholder — evaluation runner will be implemented in Phase 5."""
-    logger.info("run_eval: run=%s (placeholder)", run_id)
-    return {"run_id": str(run_id), "status": "completed"}
+    """Aggregate eval metrics, write JSON/HTML report artifacts, finalize run status."""
+    import json
+    from datetime import datetime, timezone
+
+    from backend.evaluation.service import EvaluationService
+    from backend.ingestion.storage.base import artifact_storage_key
+    from backend.ingestion.storage.service import get_storage_backend
+    from backend.repositories.run_repository import RunRepository
+
+    factory = get_session_factory()
+    storage = get_storage_backend()
+    json_key = artifact_storage_key(run_id, "report.json")
+    html_key = artifact_storage_key(run_id, "report.html")
+
+    try:
+        async with factory() as session:
+            async with session.begin():
+                run_repo = RunRepository(session)
+                eval_svc = EvaluationService(session)
+                run = await run_repo.get(run_id)
+                if run is None:
+                    logger.error("run_eval: run %s not found", run_id)
+                    return {"run_id": str(run_id), "status": "missing"}
+
+                now = datetime.now(timezone.utc)
+                run.status = "running"
+                run.started_at = now
+                await session.flush()
+
+                snap = await eval_svc.compute_and_save_aggregate(run_id)
+                report: Dict[str, Any] = {
+                    "run_id": str(run_id),
+                    "experiment_id": str(run.experiment_id),
+                    "metrics": snap.snapshot_metrics or {},
+                    "generated_at": now.isoformat(),
+                }
+                json_body = json.dumps(report, indent=2).encode("utf-8")
+                html_body = (
+                    "<!DOCTYPE html><html><head><meta charset=\"utf-8\"/>"
+                    "<title>Evaluation report</title></head><body><pre>"
+                    f"{json.dumps(report, indent=2)}"
+                    "</pre></body></html>"
+                ).encode("utf-8")
+
+                json_uri = await storage.put(json_key, json_body, "application/json")
+                await storage.put(html_key, html_body, "text/html; charset=utf-8")
+
+                done = datetime.now(timezone.utc)
+                run.status = "completed"
+                run.finished_at = done
+                run.artifact_uri = json_uri
+                run.run_logs = {
+                    **(run.run_logs or {}),
+                    "artifact_key": json_key,
+                    "artifact_html_key": html_key,
+                }
+
+        logger.info("run_eval: completed run=%s", run_id)
+        return {"run_id": str(run_id), "status": "completed"}
+    except Exception as exc:
+        logger.exception("run_eval: failed run=%s", run_id)
+        async with factory() as session:
+            async with session.begin():
+                run_repo = RunRepository(session)
+                run = await run_repo.get(run_id)
+                if run is not None:
+                    run.status = "failed"
+                    run.finished_at = datetime.now(timezone.utc)
+                    run.run_logs = {
+                        **(run.run_logs or {}),
+                        "error": str(exc)[:500],
+                    }
+        return {"run_id": str(run_id), "status": "failed"}
