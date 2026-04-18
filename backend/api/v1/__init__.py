@@ -2,13 +2,14 @@
 
 from fastapi import APIRouter
 
-from backend.api.v1 import auth, documents, health
+from backend.api.v1 import auth, documents, health, indexes
 
 router = APIRouter()
 
 router.include_router(health.router, tags=["health"])
 router.include_router(auth.router, prefix="/auth", tags=["auth"])
 router.include_router(documents.router, prefix="/documents", tags=["documents"])
+router.include_router(indexes.router, prefix="/indexes", tags=["indexes"])
 
 # Future routers (added in later tasks):
 # from backend.api.v1 import indexes, query, experiments, evaluations, metrics
