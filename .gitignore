@@ -41,6 +41,8 @@ ENV/
 *.json
 !package.json
 !package-lock.json
+!frontend/tsconfig.json
+!frontend/tsconfig.node.json
 service-account*.json
 gcloud-credentials*.json
 application_default_credentials.json
