@@ -98,6 +98,20 @@ class Settings(BaseSettings):
     otel_exporter_otlp_endpoint: Optional[str] = None
 
     # -------------------------------------------------------------------------
+    # Notifications (SendGrid / Twilio) — optional, feature-flagged
+    # -------------------------------------------------------------------------
+    notifications_enabled: bool = False
+    notification_alert_emails: Optional[str] = None  # comma-separated operator inboxes
+    notifications_sendgrid_enabled: bool = False
+    sendgrid_api_key: Optional[SecretStr] = None
+    sendgrid_from_email: Optional[str] = None
+    notifications_twilio_enabled: bool = False
+    twilio_account_sid: Optional[str] = None
+    twilio_auth_token: Optional[SecretStr] = None
+    twilio_from_number: Optional[str] = None
+    twilio_alert_to_number: Optional[str] = None
+
+    # -------------------------------------------------------------------------
     # Validation
     # -------------------------------------------------------------------------
     @field_validator("cors_origins", mode="before")
