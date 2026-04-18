@@ -18,6 +18,16 @@ export function HomePage() {
             Indexes
           </Link>
         </li>
+        <li>
+          <Link className="hover:underline" to="/query">
+            Query playground
+          </Link>
+        </li>
+        <li>
+          <Link className="hover:underline" to="/evaluations">
+            Evaluations
+          </Link>
+        </li>
       </ul>
     </div>
   );
