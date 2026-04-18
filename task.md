@@ -279,7 +279,7 @@ and `docs/LDL.md`.
 - **Files/Modules Affected:** `backend/api/v1/indexes.py`, `backend/vector_store/`, `backend/repositories/index_repository.py`, `tests/integration/`
 - **Estimated Complexity:** High
 
-## Task #18: Celery App, Queue Topology, and Worker Bootstrap
+## Task #18: Celery App, Queue Topology, and Worker Bootstrap ✅
 - **Branch:** `feature/celery-worker-foundation`
 - **Dependencies:** 2, 3, 5
 - **Parallelizable With:** 12, 13, 14, 15, 16, 17
