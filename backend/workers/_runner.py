@@ -129,6 +129,7 @@ async def run_eval(run_id: uuid.UUID) -> Dict[str, Any]:
     from datetime import datetime, timezone
 
     from backend.evaluation.service import EvaluationService
+    from backend.experiments.tracking.mlflow_tracker import try_log_evaluation_to_mlflow
     from backend.ingestion.storage.base import artifact_storage_key
     from backend.ingestion.storage.service import get_storage_backend
     from backend.repositories.run_repository import RunRepository
@@ -138,6 +139,16 @@ async def run_eval(run_id: uuid.UUID) -> Dict[str, Any]:
     json_key = artifact_storage_key(run_id, "report.json")
     html_key = artifact_storage_key(run_id, "report.html")
 
+    async with factory() as session:
+        probe = await RunRepository(session).get(run_id)
+    if probe is None:
+        logger.error("run_eval: run %s not found", run_id)
+        return {"run_id": str(run_id), "status": "missing"}
+
+    exp_id_str = str(probe.experiment_id)
+    eval_kind = str((probe.run_logs or {}).get("kind", ""))
+    metrics_for_ml: Dict[str, Any] = {}
+
     try:
         async with factory() as session:
             async with session.begin():
@@ -145,7 +156,7 @@ async def run_eval(run_id: uuid.UUID) -> Dict[str, Any]:
                 eval_svc = EvaluationService(session)
                 run = await run_repo.get(run_id)
                 if run is None:
-                    logger.error("run_eval: run %s not found", run_id)
+                    logger.error("run_eval: run %s disappeared", run_id)
                     return {"run_id": str(run_id), "status": "missing"}
 
                 now = datetime.now(timezone.utc)
@@ -180,6 +191,14 @@ async def run_eval(run_id: uuid.UUID) -> Dict[str, Any]:
                     "artifact_key": json_key,
                     "artifact_html_key": html_key,
                 }
+                metrics_for_ml = dict(snap.snapshot_metrics or {})
+
+        try_log_evaluation_to_mlflow(
+            run_id=str(run_id),
+            experiment_id=exp_id_str,
+            metrics=metrics_for_ml,
+            params={"eval_kind": eval_kind},
+        )
 
         logger.info("run_eval: completed run=%s", run_id)
         return {"run_id": str(run_id), "status": "completed"}
