@@ -90,7 +90,7 @@ VertexOps gives ML engineers and DevOps teams a single control plane for the ful
 |---|---|---|
 | **Phase 1** | Repository skeleton, config, local infra, logging | **Complete** |
 | **Phase 2** | DB engine, session management, schema models, JWT + API key auth, RBAC, rate limiting | **Complete** |
-| **Phase 3** | Ingestion and indexing pipeline — object storage abstraction complete | **In Progress** |
+| **Phase 3** | Ingestion and indexing pipeline — object storage + Documents API complete | **In Progress** |
 | Phase 4 | Retrieval and RAG query | Planned |
 | Phase 5 | Experiments, evaluation, and optimization | Planned |
 | Phase 6 | Frontend dashboard and product integrations | Planned |
@@ -306,12 +306,17 @@ All routes are served under `/api/v1`.
 | `POST` | `/api/v1/auth/api-keys` | Create API key for the authenticated user |
 | `GET` | `/api/v1/auth/api-keys` | List API keys for the authenticated user |
 | `DELETE` | `/api/v1/auth/api-keys/{key_id}` | Revoke an API key |
+| `POST` | `/api/v1/documents` | Register a document (metadata only) |
+| `POST` | `/api/v1/documents/upload-url` | Get a pre-signed upload URL for a document |
+| `POST` | `/api/v1/documents/{id}/complete` | Mark a document upload as complete |
+| `GET` | `/api/v1/documents` | List documents in the workspace (paginated) |
+| `GET` | `/api/v1/documents/{id}` | Retrieve a single document |
+| `DELETE` | `/api/v1/documents/{id}` | Delete a document and its storage object |
 
 ### Planned endpoints (see `docs/API_SPEC.md`)
 
 | Group | Prefix | Description |
 |---|---|---|
-| Documents | `/documents` | Register, list, retrieve, and delete documents |
 | Indexes | `/indexes` | Create and manage vector indexes |
 | Query | `/query` | RAG query with source citations |
 | Experiments | `/experiments` | CRUD and run kickoff |
