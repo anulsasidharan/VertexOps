@@ -253,7 +253,7 @@ and `docs/LDL.md`.
 - **Files/Modules Affected:** `backend/embedding/`, `backend/core/config.py`, `tests/unit/`
 - **Estimated Complexity:** Medium
 
-## Task #16: Vector Store Base and Pinecone Adapter
+## Task #16: Vector Store Base and Pinecone Adapter ✅
 - **Branch:** `feature/vectorstore-pinecone-adapter`
 - **Dependencies:** 2, 14
 - **Parallelizable With:** 15, 18
