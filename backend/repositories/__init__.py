@@ -1,5 +1,6 @@
 """Repository layer — data access per aggregate."""
 
+from backend.repositories.api_key_repository import APIKeyRepository
 from backend.repositories.base import BaseRepository
 from backend.repositories.chunk_repository import ChunkRepository
 from backend.repositories.deployment_repository import DeploymentRepository
@@ -13,6 +14,7 @@ from backend.repositories.user_repository import UserRepository
 from backend.repositories.workspace_repository import WorkspaceRepository
 
 __all__ = [
+    "APIKeyRepository",
     "BaseRepository",
     "ChunkRepository",
     "DeploymentRepository",
