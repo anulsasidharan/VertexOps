@@ -74,6 +74,7 @@ class Settings(BaseSettings):
     # -------------------------------------------------------------------------
     # Object storage
     # -------------------------------------------------------------------------
+    storage_backend: Literal["local", "gcs"] = "local"
     gcs_bucket_name: Optional[str] = None
     storage_local_path: str = "./storage"
 
