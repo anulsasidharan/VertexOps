@@ -143,7 +143,7 @@ and `docs/LDL.md`.
 - **Files/Modules Affected:** `backend/models/`, `backend/repositories/document_repository.py`, `backend/repositories/chunk_repository.py`, `alembic/versions/`, `tests/`
 - **Estimated Complexity:** Medium
 
-## Task #8: Index, Experiment, Run, Metric, and Deployment Schema Models
+## Task #8: Index, Experiment, Run, Metric, and Deployment Schema Models ✅
 - **Branch:** `feature/schema-indexes-experiments`
 - **Dependencies:** 5
 - **Parallelizable With:** 6, 7, 9

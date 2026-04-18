@@ -89,7 +89,7 @@ VertexOps gives ML engineers and DevOps teams a single control plane for the ful
 | Phase | Goal | Status |
 |---|---|---|
 | **Phase 1** | Repository skeleton, config, local infra, logging | **Complete** |
-| **Phase 2** | DB engine, session management, schema models (users, workspaces, documents, chunks) | **In Progress** |
+| **Phase 2** | DB engine, session management, schema models (users, workspaces, documents, chunks, indexes, experiments, runs, eval cases, metric snapshots, deployments) | **In Progress** |
 | Phase 3 | Ingestion and indexing pipeline | Planned |
 | Phase 4 | Retrieval and RAG query | Planned |
 | Phase 5 | Experiments, evaluation, and optimization | Planned |
@@ -246,6 +246,7 @@ alembic history
 |---|---|
 | `0001` | Create `workspaces` and `users` tables |
 | `0002` | Create `documents` and `chunks` tables |
+| `0003` | Create `indexes`, `experiments`, `runs`, `eval_cases`, `metric_snapshots`, and `deployments` tables |
 
 ---
 
