@@ -200,6 +200,18 @@ async def run_eval(run_id: uuid.UUID) -> Dict[str, Any]:
             params={"eval_kind": eval_kind},
         )
 
+        if eval_kind == "evaluation":
+            from backend.integrations.notifications.service import dispatch_notification
+
+            dispatch_notification(
+                "eval_completed",
+                {
+                    "run_id": str(run_id),
+                    "experiment_id": exp_id_str,
+                    "status": "completed",
+                },
+            )
+
         logger.info("run_eval: completed run=%s", run_id)
         return {"run_id": str(run_id), "status": "completed"}
     except Exception as exc:
