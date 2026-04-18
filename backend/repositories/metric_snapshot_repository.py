@@ -3,7 +3,7 @@
 from typing import List
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import asc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.models.metric_snapshot import MetricSnapshot
@@ -18,6 +18,8 @@ class MetricSnapshotRepository(BaseRepository[MetricSnapshot]):
 
     async def list_by_run(self, run_id: UUID) -> List[MetricSnapshot]:
         result = await self.session.execute(
-            select(MetricSnapshot).where(MetricSnapshot.run_id == run_id)
+            select(MetricSnapshot)
+            .where(MetricSnapshot.run_id == run_id)
+            .order_by(asc(MetricSnapshot.created_at))
         )
         return list(result.scalars().all())
