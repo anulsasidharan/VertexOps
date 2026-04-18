@@ -91,7 +91,7 @@ VertexOps gives ML engineers and DevOps teams a single control plane for the ful
 | **Phase 1** | Repository skeleton, config, local infra, logging | **Complete** |
 | **Phase 2** | DB engine, session management, schema models, JWT + API key auth, RBAC, rate limiting | **Complete** |
 | **Phase 3** | Ingestion and indexing pipeline — storage, Documents API, parsing, chunking, embedding, vector store, index management, Celery workers, and end-to-end async pipeline | **Complete** |
-| Phase 4 | Retrieval and RAG query | Planned |
+| **Phase 4** | Retrieval, hybrid search, generation, query API, realtime streaming, citations, and guardrails | **Complete** |
 | Phase 5 | Experiments, evaluation, and optimization | Planned |
 | Phase 6 | Frontend dashboard and product integrations | Planned |
 | Phase 7 | Observability, production containers, CI/CD | Planned |

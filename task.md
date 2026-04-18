@@ -36,7 +36,7 @@ and `docs/LDL.md`.
 | 1 | Bootstrap repo structure and runtime | App skeleton, config, local infra | Tasks 2-4 after Task 1 | ✅ Complete (Tasks 1-4) |
 | 2 | Establish DB, auth, and API base | Schema, auth, health, rate limits | Tasks 6-9 after Task 5 | ✅ Complete (Tasks 5-10) |
 | 3 | Build ingest to index pipeline | Upload, chunk, embed, vector indexing, workers | Tasks 12-17 after Task 11 | ✅ Complete (Tasks 11-19 ✅) |
-| 4 | Deliver RAG query capabilities | Retrieval, generation, citations, realtime | Tasks 21-24 after Task 20 | Not Started |
+| 4 | Deliver RAG query capabilities | Retrieval, generation, citations, realtime | Tasks 21-24 after Task 20 | ✅ Complete (Tasks 20-25 ✅) |
 | 5 | Add experiments and optimization loop | Experiment runs, eval reports, orchestrator | Tasks 27-30 after Task 26 | Not Started |
 | 6 | Add UI and external product hooks | Dashboard, notifications, billing hooks | Tasks 32-35 after Task 31 | Not Started |
 | 7 | Make platform deployable and automatable | Metrics, containers, CI/CD, cloud envs | Tasks 37-40 after Task 36 | Not Started |
@@ -311,7 +311,7 @@ and `docs/LDL.md`.
 
 ## Phase 4 - Retrieval and Generation
 
-## Task #20: Retrieval Service with Vector Search and Filters
+## Task #20: Retrieval Service with Vector Search and Filters ✅
 - **Branch:** `feature/retrieval-vector-baseline`
 - **Dependencies:** 16, 17, 19
 - **Parallelizable With:** None
@@ -324,7 +324,7 @@ and `docs/LDL.md`.
 - **Files/Modules Affected:** `backend/retrieval/`, `backend/vector_store/`, `tests/unit/`
 - **Estimated Complexity:** Medium
 
-## Task #21: Hybrid Retrieval, BM25, and MMR
+## Task #21: Hybrid Retrieval, BM25, and MMR ✅
 - **Branch:** `feature/retrieval-hybrid-mmr`
 - **Dependencies:** 20
 - **Parallelizable With:** 22, 24
@@ -337,7 +337,7 @@ and `docs/LDL.md`.
 - **Files/Modules Affected:** `backend/retrieval/`, `backend/indexes/` or `backend/vector_store/`, `tests/unit/`
 - **Estimated Complexity:** High
 
-## Task #22: Generation Service with Prompt Templates and OpenAI Chat Adapter
+## Task #22: Generation Service with Prompt Templates and OpenAI Chat Adapter ✅
 - **Branch:** `feature/generation-openai-service`
 - **Dependencies:** 2, 20
 - **Parallelizable With:** 21, 24
@@ -350,7 +350,7 @@ and `docs/LDL.md`.
 - **Files/Modules Affected:** `backend/generation/`, `backend/core/config.py`, `tests/unit/`
 - **Estimated Complexity:** Medium
 
-## Task #23: Query API and RAG Response Contract
+## Task #23: Query API and RAG Response Contract ✅
 - **Branch:** `feature/query-api`
 - **Dependencies:** 20, 22
 - **Parallelizable With:** 24, 25
@@ -363,7 +363,7 @@ and `docs/LDL.md`.
 - **Files/Modules Affected:** `backend/api/v1/query.py`, `backend/api/v1/rag.py`, `backend/retrieval/`, `backend/generation/`, `tests/integration/`
 - **Estimated Complexity:** Medium
 
-## Task #24: Realtime Query Streaming and Job Status Channel
+## Task #24: Realtime Query Streaming and Job Status Channel ✅
 - **Branch:** `feature/realtime-query-status`
 - **Dependencies:** 18, 23
 - **Parallelizable With:** 21, 22, 25
@@ -376,7 +376,7 @@ and `docs/LDL.md`.
 - **Files/Modules Affected:** `backend/api/realtime/`, `backend/workers/`, `frontend/` or `tests/`
 - **Estimated Complexity:** High
 
-## Task #25: Source Citation, Prompt Injection Guardrails, and Response Safety
+## Task #25: Source Citation, Prompt Injection Guardrails, and Response Safety ✅
 - **Branch:** `feature/rag-safety-citations`
 - **Dependencies:** 23
 - **Parallelizable With:** 24
