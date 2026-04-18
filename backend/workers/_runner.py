@@ -212,22 +212,22 @@ async def run_eval(run_id: uuid.UUID) -> Dict[str, Any]:
                 },
             )
 
-        from backend.integrations.billing.service import record_usage_event
+            from backend.integrations.billing.service import record_usage_event
 
-        qty = 1.0
-        for key in ("total_tokens", "prompt_tokens", "completion_tokens"):
-            raw = metrics_for_ml.get(key)
-            if raw is not None:
-                try:
-                    qty = float(raw)
-                except (TypeError, ValueError):
-                    qty = 1.0
-                break
-        record_usage_event(
-            "eval_completion",
-            qty,
-            metadata={"run_id": str(run_id), "experiment_id": exp_id_str},
-        )
+            qty = 1.0
+            for key in ("total_tokens", "prompt_tokens", "completion_tokens"):
+                raw = metrics_for_ml.get(key)
+                if raw is not None:
+                    try:
+                        qty = float(raw)
+                    except (TypeError, ValueError):
+                        qty = 1.0
+                    break
+            record_usage_event(
+                "eval_completion",
+                qty,
+                metadata={"run_id": str(run_id), "experiment_id": exp_id_str},
+            )
 
         logger.info("run_eval: completed run=%s", run_id)
         return {"run_id": str(run_id), "status": "completed"}
