@@ -34,7 +34,7 @@ and `docs/LDL.md`.
 | Phase | Goal | Primary Blocking Output | Parallel Lanes | Status |
 |------|------|--------------------------|----------------|--------|
 | 1 | Bootstrap repo structure and runtime | App skeleton, config, local infra | Tasks 2-4 after Task 1 | ✅ Complete (Tasks 1-4) |
-| 2 | Establish DB, auth, and API base | Schema, auth, health, rate limits | Tasks 6-9 after Task 5 | In Progress (Task 5 ✅) |
+| 2 | Establish DB, auth, and API base | Schema, auth, health, rate limits | Tasks 6-9 after Task 5 | ✅ Complete (Tasks 5-10) |
 | 3 | Build ingest to index pipeline | Upload, chunk, embed, vector indexing, workers | Tasks 12-17 after Task 11 | Not Started |
 | 4 | Deliver RAG query capabilities | Retrieval, generation, citations, realtime | Tasks 21-24 after Task 20 | Not Started |
 | 5 | Add experiments and optimization loop | Experiment runs, eval reports, orchestrator | Tasks 27-30 after Task 26 | Not Started |
@@ -169,7 +169,7 @@ and `docs/LDL.md`.
 - **Files/Modules Affected:** `backend/api/dependencies/auth.py`, `backend/core/security.py`, `backend/models/user*.py`, `tests/`
 - **Estimated Complexity:** High
 
-## Task #10: Health, Readiness, and Rate Limiting Endpoints
+## Task #10: Health, Readiness, and Rate Limiting Endpoints ✅
 - **Branch:** `feature/health-ready-rate-limit`
 - **Dependencies:** 4, 5, 9
 - **Parallelizable With:** None
