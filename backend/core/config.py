@@ -92,7 +92,9 @@ class Settings(BaseSettings):
     # -------------------------------------------------------------------------
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = "INFO"
     metrics_enabled: bool = False
+    mlflow_enabled: bool = False
     mlflow_tracking_uri: Optional[str] = None
+    mlflow_experiment_name: str = "vertexops-evaluations"
     otel_exporter_otlp_endpoint: Optional[str] = None
 
     # -------------------------------------------------------------------------
