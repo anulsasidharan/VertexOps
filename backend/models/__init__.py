@@ -1,5 +1,6 @@
 """SQLAlchemy ORM models."""
 
+from backend.models.api_key import APIKey
 from backend.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
 from backend.models.chunk import Chunk
 from backend.models.deployment import Deployment
@@ -13,6 +14,7 @@ from backend.models.user import User
 from backend.models.workspace import Workspace
 
 __all__ = [
+    "APIKey",
     "Base",
     "Chunk",
     "Deployment",

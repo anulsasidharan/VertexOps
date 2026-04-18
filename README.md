@@ -89,7 +89,7 @@ VertexOps gives ML engineers and DevOps teams a single control plane for the ful
 | Phase | Goal | Status |
 |---|---|---|
 | **Phase 1** | Repository skeleton, config, local infra, logging | **Complete** |
-| **Phase 2** | DB engine, session management, schema models (users, workspaces, documents, chunks, indexes, experiments, runs, eval cases, metric snapshots, deployments) | **In Progress** |
+| **Phase 2** | DB engine, session management, schema models, JWT + API key auth, RBAC role checks | **In Progress** |
 | Phase 3 | Ingestion and indexing pipeline | Planned |
 | Phase 4 | Retrieval and RAG query | Planned |
 | Phase 5 | Experiments, evaluation, and optimization | Planned |
@@ -247,6 +247,7 @@ alembic history
 | `0001` | Create `workspaces` and `users` tables |
 | `0002` | Create `documents` and `chunks` tables |
 | `0003` | Create `indexes`, `experiments`, `runs`, `eval_cases`, `metric_snapshots`, and `deployments` tables |
+| `0004` | Create `api_keys` table |
 
 ---
 
@@ -301,6 +302,10 @@ All routes are served under `/api/v1`.
 |---|---|---|
 | `GET` | `/api/v1/health` | Liveness probe — always returns `200 OK` |
 | `GET` | `/api/v1/ready` | Readiness probe — checks database connectivity |
+| `POST` | `/api/v1/auth/token` | Issue JWT access token (email + password) |
+| `POST` | `/api/v1/auth/api-keys` | Create API key for the authenticated user |
+| `GET` | `/api/v1/auth/api-keys` | List API keys for the authenticated user |
+| `DELETE` | `/api/v1/auth/api-keys/{key_id}` | Revoke an API key |
 
 ### Planned endpoints (see `docs/API_SPEC.md`)
 
