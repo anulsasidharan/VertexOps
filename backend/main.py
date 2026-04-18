@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 
+from backend.api.realtime.websocket import router as ws_router
 from backend.api.v1 import router as v1_router
 from backend.core.config import get_settings
 from backend.core.db import dispose_engine, init_engine
@@ -68,6 +69,7 @@ def create_app() -> FastAPI:
     # Routers
     # ------------------------------------------------------------------
     app.include_router(v1_router, prefix="/api/v1")
+    app.include_router(ws_router, tags=["realtime"])
 
     return app
 
