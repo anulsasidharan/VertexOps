@@ -5,9 +5,11 @@ import { AuthSessionProvider } from "@/context/AuthSessionContext";
 import { DashboardLayout } from "@/layout/DashboardLayout";
 import { DocumentDetailPage } from "@/pages/DocumentDetailPage";
 import { DocumentsPage } from "@/pages/DocumentsPage";
+import { EvaluationsPage } from "@/pages/EvaluationsPage";
 import { HomePage } from "@/pages/HomePage";
 import { IndexesPage } from "@/pages/IndexesPage";
 import { LoginPage } from "@/pages/LoginPage";
+import { QueryPlaygroundPage } from "@/pages/QueryPlaygroundPage";
 
 export function App() {
   return (
@@ -21,6 +23,8 @@ export function App() {
               <Route path="/documents" element={<DocumentsPage />} />
               <Route path="/documents/:documentId" element={<DocumentDetailPage />} />
               <Route path="/indexes" element={<IndexesPage />} />
+              <Route path="/query" element={<QueryPlaygroundPage />} />
+              <Route path="/evaluations" element={<EvaluationsPage />} />
             </Route>
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />

@@ -38,3 +38,47 @@ export type IndexListDto = {
   items: IndexDto[];
   total: number;
 };
+
+export type SourceChunkDto = {
+  chunk_id: string;
+  document_id: string;
+  score: number;
+  text: string;
+  section_path?: string | null;
+};
+
+export type QueryResponseDto = {
+  answer: string;
+  sources: SourceChunkDto[];
+  model: string;
+  latency_ms: number;
+  prompt_tokens: number;
+  completion_tokens: number;
+};
+
+export type EvaluationDetailDto = {
+  id: string;
+  experiment_id: string;
+  status: string;
+  started_at: string | null;
+  finished_at: string | null;
+  artifact_uri: string | null;
+  metrics: Record<string, unknown> | null;
+};
+
+export type ExperimentDto = {
+  id: string;
+  workspace_id: string;
+  name: string;
+  description: string | null;
+  index_id: string | null;
+  config: Record<string, unknown>;
+  config_hash: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ExperimentListDto = {
+  items: ExperimentDto[];
+  total: number;
+};
