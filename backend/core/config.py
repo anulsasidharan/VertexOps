@@ -78,6 +78,15 @@ class Settings(BaseSettings):
     storage_local_path: str = "./storage"
 
     # -------------------------------------------------------------------------
+    # Rate limiting
+    # -------------------------------------------------------------------------
+    rate_limit_enabled: bool = True
+    rate_limit_default_requests: int = 100
+    rate_limit_default_window_seconds: int = 60
+    rate_limit_strict_requests: int = 20
+    rate_limit_strict_window_seconds: int = 60
+
+    # -------------------------------------------------------------------------
     # Observability
     # -------------------------------------------------------------------------
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = "INFO"

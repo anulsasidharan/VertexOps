@@ -4,6 +4,7 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 
 from backend.core.db import check_db_connectivity
+from backend.core.rate_limit import check_redis_connectivity
 
 router = APIRouter()
 
@@ -27,8 +28,12 @@ async def health() -> HealthResponse:
 async def ready() -> ReadinessResponse:
     """Returns 200 when all critical dependencies are reachable."""
     db_ok = await check_db_connectivity()
-    all_ok = db_ok
+    redis_ok = await check_redis_connectivity()
+    all_ok = db_ok and redis_ok
     return ReadinessResponse(
         status="ok" if all_ok else "degraded",
-        checks={"database": "ok" if db_ok else "unreachable"},
+        checks={
+            "database": "ok" if db_ok else "unreachable",
+            "redis": "ok" if redis_ok else "unreachable",
+        },
     )
