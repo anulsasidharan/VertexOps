@@ -18,6 +18,12 @@ export function DashboardLayout() {
           <NavLink to="/" end className={linkClass}>
             Home
           </NavLink>
+          <NavLink to="/documents" className={linkClass}>
+            Documents
+          </NavLink>
+          <NavLink to="/indexes" className={linkClass}>
+            Indexes
+          </NavLink>
         </nav>
         <button
           type="button"
