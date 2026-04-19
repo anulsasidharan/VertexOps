@@ -1,8 +1,9 @@
 # VertexOps — local development infrastructure
 #
 # Usage:
-#   docker compose up -d                    # start all services
+#   docker compose up -d                    # start API + backing services
 #   docker compose up -d postgres redis     # backing services only
+#   docker compose --profile worker up -d worker
 #   docker compose logs -f api              # follow API logs
 #   docker compose down -v                  # stop and remove volumes
 #
@@ -13,9 +14,6 @@
 # Connection URLs from inside containers (container-to-container):
 #   DATABASE_URL  = postgresql+asyncpg://vertexops:vertexops@postgres:5432/vertexops
 #   REDIS_URL     = redis://redis:6379/0
-#
-# The `api` and `worker` services override these automatically via the
-# environment block below; host-side .env values are not required inside them.
 
 version: "3.9"
 
@@ -26,16 +24,14 @@ x-app-env: &app-env
   APP_ENV: development
   LOG_LEVEL: INFO
   DEBUG: "false"
-  # --- Database (container-to-container hostnames) ---
+  METRICS_ENABLED: "false"
   DATABASE_URL: postgresql+asyncpg://vertexops:vertexops@postgres:5432/vertexops
-  # --- Redis (container-to-container hostnames) ---
   REDIS_URL: redis://redis:6379/0
   REDIS_BROKER_URL: redis://redis:6379/1
   CELERY_RESULT_BACKEND: redis://redis:6379/2
-  # --- Auth secrets (development placeholders — change in staging/prod) ---
+  # Development placeholders — override with real secrets in staging/prod
   JWT_SECRET_KEY: dev-jwt-secret-change-in-production
   API_KEY_PEPPER: dev-api-key-pepper-change-in-production
-  # --- CORS ---
   CORS_ORIGINS: "http://localhost:3000,http://localhost:5173"
 
 services:
@@ -52,7 +48,6 @@ services:
       POSTGRES_PASSWORD: vertexops
       POSTGRES_DB: vertexops
     ports:
-      # Host port 5432 → container port 5432
       # Avoid publishing this port in production compose overlays.
       - "5432:5432"
     volumes:
@@ -73,10 +68,8 @@ services:
     image: redis:7-alpine
     container_name: vertexops_redis
     restart: unless-stopped
-    # Persist data across restarts; remove `command` line to disable AOF
     command: redis-server --appendonly yes
     ports:
-      # Host port 6379 → container port 6379
       # Avoid publishing this port in production compose overlays.
       - "6379:6379"
     volumes:
@@ -91,14 +84,14 @@ services:
       - vertexops_net
 
   # ---------------------------------------------------------------------------
-  # API — FastAPI application
+  # API — FastAPI application (api target from Dockerfile)
   # ---------------------------------------------------------------------------
   api:
     build:
       context: .
       dockerfile: Dockerfile
-      target: runtime
-    image: vertexops:latest
+      target: api
+    image: vertexops-api:latest
     container_name: vertexops_api
     restart: unless-stopped
     environment:
@@ -111,27 +104,25 @@ services:
       redis:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      test: ["CMD", "curl", "-fsS", "http://localhost:8000/api/v1/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 20s
+      start_period: 30s
     networks:
       - vertexops_net
 
   # ---------------------------------------------------------------------------
-  # Worker — Celery background tasks (placeholder; wired up in Task #18)
+  # Worker — Celery background tasks (worker target from Dockerfile)
+  # Start with: docker compose --profile worker up -d worker
   # ---------------------------------------------------------------------------
   worker:
-    image: vertexops:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: worker
+    image: vertexops-worker:latest
     container_name: vertexops_worker
-    # Override the default uvicorn CMD with the Celery worker command.
-    # Queue names (ingest, embed, eval, index) will be finalised in Task #18.
-    command: >
-      celery -A backend.workers.celery_app worker
-      --loglevel=info
-      --queues=ingest,embed,eval,index
-      --concurrency=2
     restart: unless-stopped
     environment:
       <<: *app-env
@@ -143,12 +134,10 @@ services:
     networks:
       - vertexops_net
     profiles:
-      # Only started explicitly: `docker compose --profile worker up -d`
-      # Remove this block once Task #18 is complete.
       - worker
 
 # ---------------------------------------------------------------------------
-# Named volumes — data persists across `docker compose down` (without -v)
+# Named volumes
 # ---------------------------------------------------------------------------
 volumes:
   postgres_data:
@@ -157,7 +146,7 @@ volumes:
     driver: local
 
 # ---------------------------------------------------------------------------
-# Internal network — services communicate by service name, not localhost
+# Internal network
 # ---------------------------------------------------------------------------
 networks:
   vertexops_net:

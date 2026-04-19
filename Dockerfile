@@ -5,14 +5,14 @@ FROM python:3.11-slim AS builder
 
 WORKDIR /build
 
-# Install build tools needed for some native wheels (e.g. asyncpg)
+# Build tools needed for native wheels (asyncpg, bcrypt, etc.)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     libpq-dev \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# uv — export frozen requirements from uv.lock (pin image tag in production CI)
+# Pin the uv image tag for reproducible builds
 COPY --from=ghcr.io/astral-sh/uv:0.9.6 /uv /usr/local/bin/uv
 
 COPY pyproject.toml uv.lock ./
@@ -22,17 +22,17 @@ RUN pip install --upgrade pip \
     && pip wheel --no-cache-dir --wheel-dir /build/wheels -r requirements.txt
 
 # =============================================================================
-# Stage 2: runtime image
+# Stage 2: runtime base — shared by api and worker targets
 # =============================================================================
-FROM python:3.11-slim AS runtime
+FROM python:3.11-slim AS runtime-base
 
-# Non-root user for production safety
+# Non-root user for production hardening
 RUN groupadd --gid 1001 appgroup \
-    && useradd --uid 1001 --gid appgroup --no-create-home appuser
+    && useradd --uid 1001 --gid appgroup --no-create-home --shell /sbin/nologin appuser
 
 WORKDIR /app
 
-# Runtime system libs only
+# Runtime system libs only (no build tools)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq5 \
     curl \
@@ -46,20 +46,44 @@ RUN pip install --no-cache-dir --no-index --find-links /tmp/wheels -r /tmp/requi
 
 # Copy application source
 COPY backend/ ./backend/
-# alembic/ and alembic.ini are added in Task #5 (db-foundation);
-# uncomment the lines below once that branch is merged.
-# COPY alembic/ ./alembic/
-# COPY alembic.ini ./alembic.ini
+COPY alembic/ ./alembic/
+COPY alembic.ini ./alembic.ini
+COPY scripts/ ./scripts/
 
 RUN chown -R appuser:appgroup /app
 USER appuser
 
-# Expose API port
+# =============================================================================
+# Stage 3a: api — FastAPI + Uvicorn
+# =============================================================================
+FROM runtime-base AS api
+
 EXPOSE 8000
 
-# Health check — delegates to the /health endpoint
-HEALTHCHECK --interval=30s --timeout=10s --start-period=20s --retries=3 \
-    CMD curl -f http://localhost:8000/api/v1/health || exit 1
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -fsS http://localhost:8000/api/v1/health || exit 1
 
-# Default: run the API server (override CMD for worker containers)
-CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "backend.main:app", \
+     "--host", "0.0.0.0", \
+     "--port", "8000", \
+     "--workers", "1", \
+     "--log-config", "/dev/null"]
+
+# =============================================================================
+# Stage 3b: worker — Celery background task processor
+# =============================================================================
+FROM runtime-base AS worker
+
+HEALTHCHECK --interval=60s --timeout=15s --start-period=30s --retries=3 \
+    CMD celery -A backend.workers.celery_app inspect ping --timeout 10 || exit 1
+
+CMD ["celery", "-A", "backend.workers.celery_app", "worker", \
+     "--loglevel=info", \
+     "--queues=ingest,embed,eval,index", \
+     "--concurrency=2", \
+     "--max-tasks-per-child=100"]
+
+# =============================================================================
+# Default target: api  (override with --target worker for worker image)
+# =============================================================================
+FROM api AS runtime
