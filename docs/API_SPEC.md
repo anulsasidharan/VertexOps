@@ -57,7 +57,30 @@ If wrapping is used, skip double-wrapping when the handler already returns `data
 
 ---
 
-## 3. Core model and RAG endpoints (CLAUDE baseline)
+## 3. Authentication
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| POST | `/auth/token` | No | Issue JWT access token (email + password) |
+| POST | `/auth/api-keys` | Yes | Create API key for the authenticated user |
+| GET | `/auth/api-keys` | Yes | List API keys for the authenticated user |
+| DELETE | `/auth/api-keys/{key_id}` | Yes | Revoke an API key |
+
+**Token request:**
+
+```json
+{ "email": "user@example.com", "password": "secret" }
+```
+
+**Token response:**
+
+```json
+{ "access_token": "<jwt>", "token_type": "bearer" }
+```
+
+---
+
+## 4. Core model and RAG endpoints (CLAUDE baseline)
 
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
@@ -70,7 +93,7 @@ If wrapping is used, skip double-wrapping when the handler already returns `data
 
 ---
 
-## 4. Documents and ingestion
+## 5. Documents and ingestion
 
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
@@ -83,7 +106,7 @@ If wrapping is used, skip double-wrapping when the handler already returns `data
 
 ---
 
-## 5. Indexing and pipelines
+## 6. Indexing and pipelines
 
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
@@ -94,7 +117,7 @@ If wrapping is used, skip double-wrapping when the handler already returns `data
 
 ---
 
-## 6. Query (RAG)
+## 7. Query (RAG)
 
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
@@ -127,7 +150,7 @@ If wrapping is used, skip double-wrapping when the handler already returns `data
 
 ---
 
-## 7. Experiments
+## 8. Experiments
 
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
@@ -139,7 +162,7 @@ If wrapping is used, skip double-wrapping when the handler already returns `data
 
 ---
 
-## 8. Evaluation
+## 9. Evaluation
 
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
@@ -149,7 +172,7 @@ If wrapping is used, skip double-wrapping when the handler already returns `data
 
 ---
 
-## 9. Metrics and observability (optional)
+## 10. Metrics and observability (optional)
 
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
@@ -157,13 +180,13 @@ If wrapping is used, skip double-wrapping when the handler already returns `data
 
 ---
 
-## 10. Webhooks (optional, post-MVP patterns)
+## 11. Webhooks (optional, post-MVP patterns)
 
 - Outbound signed webhooks for **eval complete**, **index build complete**, or **deployment status** — document payload schema alongside implementation.
 
 ---
 
-## 11. Related documents
+## 12. Related documents
 
 - [PRD.md](PRD.md) — requirements
 - [ARCHITECTURE.md](ARCHITECTURE.md) — components
