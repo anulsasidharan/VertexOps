@@ -39,7 +39,7 @@ and `docs/LDL.md`.
 | 4 | Deliver RAG query capabilities | Retrieval, generation, citations, realtime | Tasks 21-24 after Task 20 | ✅ Complete (Tasks 20-25 ✅) |
 | 5 | Add experiments and optimization loop | Experiment runs, eval reports, orchestrator | Tasks 27-30 after Task 26 | ✅ Complete (Tasks 26-30 ✅) |
 | 6 | Add UI and external product hooks | Dashboard, notifications, billing hooks | Tasks 32-35 after Task 31 | ✅ Complete (Tasks 31-35) |
-| 7 | Make platform deployable and automatable | Metrics, containers, CI/CD, cloud envs | Tasks 37-40 after Task 36 | Not Started |
+| 7 | Make platform deployable and automatable | Metrics, containers, CI/CD, cloud envs | Tasks 37-40 after Task 36 | ✅ Complete (Tasks 36-40 ✅) |
 | 8 | Finish quality bar and release docs | E2E, hardening, roadmap closeout | Tasks 41-42 after Task 40 | Not Started |
 
 ---
@@ -589,7 +589,7 @@ and `docs/LDL.md`.
 - **Files/Modules Affected:** `.github/workflows/` or `cloudbuild.yaml`, `scripts/`, `docs/DEPLOYMENT.md`
 - **Estimated Complexity:** High
 
-## Task #40: Optional AWS Deployment Parity Pack
+## Task #40: Optional AWS Deployment Parity Pack ✅
 - **Branch:** `feature/aws-deployment-parity`
 - **Dependencies:** 38, 39
 - **Parallelizable With:** None
@@ -602,7 +602,7 @@ and `docs/LDL.md`.
 - **Files/Modules Affected:** `terraform/aws/` or `deploy/aws/`, `docs/DEPLOYMENT.md`
 - **Estimated Complexity:** Medium
 
-✅ Milestone 7: Deployment Pipeline Complete
+✅ Milestone 7: Deployment Pipeline Complete (Tasks 36-40)
 
 ---
 

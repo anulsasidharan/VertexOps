@@ -94,7 +94,7 @@ VertexOps gives ML engineers and DevOps teams a single control plane for the ful
 | **Phase 4** | Retrieval, hybrid search, generation, query API, realtime streaming, citations, and guardrails | **Complete** |
 | **Phase 5** | Experiments, evaluation, MLflow tracking, and LangGraph optimization orchestrator | **Complete** |
 | **Phase 6** | Frontend dashboard, query playground, eval views, SendGrid/Twilio notifications, Stripe billing hooks | **Complete** |
-| Phase 7 | Observability, production containers, CI/CD | Planned |
+| **Phase 7** | Prometheus metrics, OTel tracing, audit logging, production Docker targets, GCP Cloud Run manifests, Cloud Build pipeline, GitHub Actions CI/CD, AWS parity Terraform | **Complete** |
 | Phase 8 | Final quality sweep and documentation | Planned |
 
 ---
