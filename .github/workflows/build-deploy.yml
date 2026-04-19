@@ -1,0 +1,195 @@
+name: Build & Deploy
+
+on:
+  push:
+    branches: [development]
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        required: true
+        default: staging
+        type: choice
+        options: [staging, production]
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false   # never cancel an in-progress deploy
+
+env:
+  PYTHON_VERSION: "3.11"
+  REGION: ${{ vars.GCP_REGION || 'us-central1' }}
+  ARTIFACT_REPO: ${{ vars.ARTIFACT_REGISTRY_REPO || 'vertexops' }}
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Determine target environment from the trigger
+  # ---------------------------------------------------------------------------
+  context:
+    name: Resolve Context
+    runs-on: ubuntu-latest
+    outputs:
+      environment: ${{ steps.env.outputs.environment }}
+      image_tag: ${{ steps.tag.outputs.image_tag }}
+    steps:
+      - id: env
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "environment=${{ github.event.inputs.environment }}" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            echo "environment=production" >> $GITHUB_OUTPUT
+          else
+            echo "environment=staging" >> $GITHUB_OUTPUT
+          fi
+
+      - id: tag
+        run: |
+          SHA="${{ github.sha }}"
+          echo "image_tag=${SHA:0:8}" >> $GITHUB_OUTPUT
+
+  # ---------------------------------------------------------------------------
+  # Build and push images to Artifact Registry
+  # ---------------------------------------------------------------------------
+  build-push:
+    name: Build & Push Images
+    runs-on: ubuntu-latest
+    needs: context
+    environment: ${{ needs.context.outputs.environment }}
+    permissions:
+      contents: read
+      id-token: write   # for Workload Identity Federation
+    env:
+      IMAGE_TAG: ${{ needs.context.outputs.image_tag }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate to GCP (Workload Identity)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_SA_EMAIL }}
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build & push API image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          target: api
+          push: true
+          cache-from: type=registry,ref=${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.ARTIFACT_REPO }}/vertexops-api:latest
+          cache-to: type=inline
+          tags: |
+            ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.ARTIFACT_REPO }}/vertexops-api:${{ env.IMAGE_TAG }}
+            ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.ARTIFACT_REPO }}/vertexops-api:latest
+
+      - name: Build & push Worker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          target: worker
+          push: true
+          cache-from: type=registry,ref=${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.ARTIFACT_REPO }}/vertexops-worker:latest
+          cache-to: type=inline
+          tags: |
+            ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.ARTIFACT_REPO }}/vertexops-worker:${{ env.IMAGE_TAG }}
+            ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.ARTIFACT_REPO }}/vertexops-worker:latest
+
+  # ---------------------------------------------------------------------------
+  # Deploy to staging (automatic on push to development)
+  # ---------------------------------------------------------------------------
+  deploy-staging:
+    name: Deploy → Staging
+    runs-on: ubuntu-latest
+    needs: [context, build-push]
+    if: needs.context.outputs.environment == 'staging'
+    environment: staging
+    permissions:
+      id-token: write
+    env:
+      IMAGE_TAG: ${{ needs.context.outputs.image_tag }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_SA_EMAIL }}
+
+      - name: Run DB migrations (Cloud Run Job)
+        run: |
+          gcloud run jobs execute vertexops-migrate \
+            --region=${{ env.REGION }} \
+            --wait \
+            --format=none
+
+      - name: Deploy API to Cloud Run (staging)
+        run: |
+          gcloud run deploy vertexops-api-staging \
+            --image=${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.ARTIFACT_REPO }}/vertexops-api:${{ env.IMAGE_TAG }} \
+            --region=${{ env.REGION }} \
+            --platform=managed
+
+      - name: Deploy Worker to Cloud Run (staging)
+        run: |
+          gcloud run deploy vertexops-worker-staging \
+            --image=${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.ARTIFACT_REPO }}/vertexops-worker:${{ env.IMAGE_TAG }} \
+            --region=${{ env.REGION }} \
+            --platform=managed
+
+  # ---------------------------------------------------------------------------
+  # Deploy to production (requires manual approval; triggered by version tag)
+  # ---------------------------------------------------------------------------
+  deploy-production:
+    name: Deploy → Production
+    runs-on: ubuntu-latest
+    needs: [context, build-push]
+    if: needs.context.outputs.environment == 'production'
+    # The "production" GitHub environment requires a reviewer approval
+    environment: production
+    permissions:
+      id-token: write
+    env:
+      IMAGE_TAG: ${{ needs.context.outputs.image_tag }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_SA_EMAIL }}
+
+      - name: Run DB migrations (Cloud Run Job)
+        run: |
+          gcloud run jobs execute vertexops-migrate \
+            --region=${{ env.REGION }} \
+            --wait \
+            --format=none
+
+      - name: Deploy API — no traffic
+        run: |
+          gcloud run deploy vertexops-api \
+            --image=${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.ARTIFACT_REPO }}/vertexops-api:${{ env.IMAGE_TAG }} \
+            --region=${{ env.REGION }} \
+            --platform=managed \
+            --no-traffic
+
+      - name: Shift 100% traffic to new revision
+        run: |
+          gcloud run services update-traffic vertexops-api \
+            --region=${{ env.REGION }} \
+            --to-latest
+
+      - name: Deploy Worker
+        run: |
+          gcloud run deploy vertexops-worker \
+            --image=${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.ARTIFACT_REPO }}/vertexops-worker:${{ env.IMAGE_TAG }} \
+            --region=${{ env.REGION }} \
+            --platform=managed
