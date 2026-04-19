@@ -154,3 +154,70 @@ You have access to the entire project. reference for each Phase of development a
 [Prompt:]
 [Agent continuation after context summarization: complete Phase 6 Task #35 `feature/stripe-usage-hooks` (Stripe billing / usage metering abstraction, query and eval hooks, tests, merge to development).]
 ---
+### 2026-04-18 00:00 UTC
+[Timestamp: 2026-04-18T23:30:00Z]
+[Prompt:]
+I want to see the application. How can I see the frontend?
+---
+### 2026-04-18 00:00 UTC
+[Timestamp: 2026-04-18T12:00:00Z]
+[Prompt:]
+```text
+(base) PS E:\EURON_AI_INTERNSHIP\01-VertexOps> uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000
+...
+ValidationError: 2 validation errors for Settings
+jwt_secret_key
+  Field required [type=missing, input_value={}, input_type=dict]
+api_key_pepper
+  Field required [type=missing, input_value={}, input_type=dict]
+```
+---
+### 2026-04-18 00:00 UTC
+[Timestamp: 2026-04-18T23:45:00Z]
+[Prompt:]
+what is the default username and password?
+---
+### 2026-04-18 00:00 UTC
+[Timestamp: 2026-04-19T00:10:00Z]
+[Prompt:]
+1
+---
+### 2026-04-19 00:00 UTC
+[Timestamp: 2026-04-19T01:00:00Z]
+[Prompt:]
+(base) PS E:\EURON_AI_INTERNSHIP\01-VertexOps\frontend> alembic upgrade head
+FAILED: No 'script_location' key found in configuration.
+(base) PS E:\EURON_AI_INTERNSHIP\01-VertexOps\frontend> python -m scripts.bootstrap_dev_user
+C:\ProgramData\anaconda3\python.exe: No module named scripts.bootstrap_dev_user
+[... additional attempts with custom email/password redacted ...]
+---
+### 2026-04-19 00:00 UTC
+[Timestamp: 2026-04-19T02:00:00Z]
+[Prompt:]
+alembic upgrade head / bootstrap_dev_user traceback: ConnectionRefusedError WinError 1225 (long paste; credentials redacted)
+---
+### 2026-04-19 00:00 UTC
+[Timestamp: 2026-04-19T03:00:00Z]
+[Prompt:]
+npm install in frontend: ERESOLVE @vitejs/plugin-react vs vite@8 peer dependency conflict (npm error log)
+---
+### 2026-04-19 00:00 UTC
+[Timestamp: 2026-04-19T04:00:00Z]
+[Prompt:]
+Invalid credentials or server error.
+---
+### 2026-04-19 00:00 UTC
+[Timestamp: 2026-04-19T05:00:00Z]
+[Prompt:]
+Server error — check the API terminal logs and database connectivity.
+---
+### 2026-04-19 00:00 UTC
+[Timestamp: 2026-04-19T06:00:00Z]
+[Prompt:]
+bootstrap_dev_user output: (trapped) error reading bcrypt version / AttributeError bcrypt __about__ — user created successfully (command included email; password not logged here)
+---
+### 2026-04-19 00:00 UTC
+[Timestamp: 2026-04-19T07:00:00Z]
+[Prompt:]
+use uv package manager to manage the dependencies
+---

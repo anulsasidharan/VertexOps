@@ -56,12 +56,13 @@ class TestSettingsValidation:
     def test_missing_jwt_secret_raises(self, monkeypatch):
         monkeypatch.delenv("JWT_SECRET_KEY", raising=False)
         with pytest.raises(ValidationError, match="jwt_secret_key"):
-            Settings(api_key_pepper="pepper")
+            # Ignore repo .env so missing-secret behavior is deterministic in CI.
+            Settings(_env_file=None, api_key_pepper="pepper")
 
     def test_missing_api_key_pepper_raises(self, monkeypatch):
         monkeypatch.delenv("API_KEY_PEPPER", raising=False)
         with pytest.raises(ValidationError, match="api_key_pepper"):
-            Settings(jwt_secret_key="secret")
+            Settings(_env_file=None, jwt_secret_key="secret")
 
     def test_invalid_app_env_raises(self):
         with pytest.raises(ValidationError):
