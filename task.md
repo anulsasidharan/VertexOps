@@ -40,7 +40,7 @@ and `docs/LDL.md`.
 | 5 | Add experiments and optimization loop | Experiment runs, eval reports, orchestrator | Tasks 27-30 after Task 26 | ✅ Complete (Tasks 26-30 ✅) |
 | 6 | Add UI and external product hooks | Dashboard, notifications, billing hooks | Tasks 32-35 after Task 31 | ✅ Complete (Tasks 31-35) |
 | 7 | Make platform deployable and automatable | Metrics, containers, CI/CD, cloud envs | Tasks 37-40 after Task 36 | ✅ Complete (Tasks 36-40 ✅) |
-| 8 | Finish quality bar and release docs | E2E, hardening, roadmap closeout | Tasks 41-42 after Task 40 | Not Started |
+| 8 | Finish quality bar and release docs | E2E, hardening, roadmap closeout | Tasks 41-42 after Task 40 | ✅ Complete (Tasks 41-42 ✅) |
 
 ---
 
@@ -608,7 +608,7 @@ and `docs/LDL.md`.
 
 ## Phase 8 - Final Quality and Documentation
 
-## Task #41: Unit, Integration, and E2E Quality Sweep
+## Task #41: Unit, Integration, and E2E Quality Sweep ✅
 - **Branch:** `feature/test-suites-and-fixtures`
 - **Dependencies:** 30, 33, 39
 - **Parallelizable With:** 42
@@ -621,7 +621,7 @@ and `docs/LDL.md`.
 - **Files/Modules Affected:** `tests/unit/`, `tests/integration/`, `tests/e2e/`, `frontend/`, `pytest.ini` or equivalent
 - **Estimated Complexity:** High
 
-## Task #42: Documentation, Release Checklist, and Task Roadmap Reconciliation
+## Task #42: Documentation, Release Checklist, and Task Roadmap Reconciliation ✅
 - **Branch:** `feature/docs-and-release-polish`
 - **Dependencies:** 38, 39, 41
 - **Parallelizable With:** None
@@ -634,7 +634,7 @@ and `docs/LDL.md`.
 - **Files/Modules Affected:** `docs/`, `.env.example`, `README.md`, `task.md`
 - **Estimated Complexity:** Medium
 
-✅ Milestone 8: Release Readiness Complete
+✅ Milestone 8: Release Readiness Complete (Tasks 41-42 ✅)
 
 ---
 

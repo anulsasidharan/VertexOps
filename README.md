@@ -95,7 +95,7 @@ VertexOps gives ML engineers and DevOps teams a single control plane for the ful
 | **Phase 5** | Experiments, evaluation, MLflow tracking, and LangGraph optimization orchestrator | **Complete** |
 | **Phase 6** | Frontend dashboard, query playground, eval views, SendGrid/Twilio notifications, Stripe billing hooks | **Complete** |
 | **Phase 7** | Prometheus metrics, OTel tracing, audit logging, production Docker targets, GCP Cloud Run manifests, Cloud Build pipeline, GitHub Actions CI/CD, AWS parity Terraform | **Complete** |
-| Phase 8 | Final quality sweep and documentation | Planned |
+| **Phase 8** | Unit / integration / E2E quality sweep, release checklist, and full documentation reconciliation | **Complete** |
 
 ---
 
@@ -130,7 +130,8 @@ vertexops/
 │   └── versions/                # Migration scripts (0001_workspaces_and_users, …)
 ├── tests/
 │   ├── unit/                    # Unit tests with mocked dependencies
-│   └── integration/             # Integration tests against live services
+│   ├── integration/             # Integration tests against live services
+│   └── e2e/                     # End-to-end journey tests (auth, document flow, query playground)
 ├── docs/                        # Architecture, API spec, DB schema, and deployment docs
 ├── frontend/                    # React/Vite dashboard (login, documents, indexes, query playground, evaluations)
 ├── docker-compose.yml           # Local dev: API, PostgreSQL, Redis, Worker
@@ -273,10 +274,16 @@ uv run alembic history
 ## Running Tests
 
 ```bash
-# All unit tests
+# Unit tests only (no external dependencies)
 uv run pytest tests/unit/
 
-# All tests (requires running PostgreSQL and Redis for integration tests)
+# Integration tests (mocked dependencies — no live services required)
+uv run pytest tests/integration/
+
+# End-to-end journey tests (mocked dependencies — no live services required)
+uv run pytest tests/e2e/
+
+# All tests
 uv run pytest
 
 # With coverage report
@@ -286,7 +293,7 @@ uv run pytest --cov=backend --cov-report=term-missing
 uv run pytest tests/unit/test_db.py -v
 ```
 
-The test suite uses `pytest-asyncio` in auto mode. Required environment variables are set automatically in `tests/conftest.py` — no `.env` file is needed for unit tests.
+The test suite uses `pytest-asyncio` in auto mode. Required environment variables are set automatically in `tests/conftest.py` — no `.env` file is needed to run any suite. External providers (OpenAI, Pinecone, GCP, Stripe) are always mocked.
 
 ---
 
@@ -344,11 +351,8 @@ All routes are served under `/api/v1`.
 | `GET` | `/api/v1/evaluations/{id}` | Retrieve evaluation status |
 | `GET` | `/api/v1/evaluations/{id}/report` | Download evaluation report artifact |
 
-### Planned endpoints (see `docs/API_SPEC.md`)
-
-| Group | Prefix | Description |
-|---|---|---|
-| Metrics | `/metrics` | Prometheus metrics endpoint (Phase 7) |
+| `GET` | `/api/v1/metrics` | Prometheus metrics (enabled via `METRICS_ENABLED=true`) |
+| `POST` | `/api/v1/rag/query` | RAG query alias — returns `response_text` + `source_docs` |
 
 Error responses follow a consistent envelope:
 
@@ -378,6 +382,7 @@ Detailed specifications live in the `docs/` directory:
 | [`docs/HDL.md`](docs/HDL.md) | High-level design |
 | [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) | GCP deployment guide and environment templates |
 | [`docs/PRD.md`](docs/PRD.md) | Product requirements document |
+| [`docs/RELEASE_CHECKLIST.md`](docs/RELEASE_CHECKLIST.md) | Pre-release verification checklist (migrations, secrets, observability, rollback) |
 | [`task.md`](task.md) | Implementation roadmap and task tracking |
 
 ---
