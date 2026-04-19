@@ -1,0 +1,65 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: vertexops-worker
+  annotations:
+    # Worker is internal-only; not reachable from public internet
+    run.googleapis.com/ingress: internal
+spec:
+  template:
+    metadata:
+      annotations:
+        # Workers are long-running; keep at least 1 instance warm
+        autoscaling.knative.dev/minScale: "1"
+        autoscaling.knative.dev/maxScale: "5"
+    spec:
+      serviceAccountName: vertexops-worker@${GCP_PROJECT_ID}.iam.gserviceaccount.com
+      timeoutSeconds: 900
+      containers:
+        - image: ${REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/vertexops/vertexops-worker:${IMAGE_TAG}
+          name: worker
+          resources:
+            limits:
+              cpu: "4"
+              memory: 4Gi
+          command:
+            - celery
+            - -A
+            - backend.workers.celery_app
+            - worker
+            - --loglevel=info
+            - --queues=ingest,embed,eval,index
+            - --concurrency=4
+            - --max-tasks-per-child=100
+          env:
+            - name: APP_ENV
+              value: production
+            - name: LOG_LEVEL
+              value: INFO
+            - name: GCP_PROJECT_ID
+              value: ${GCP_PROJECT_ID}
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: vertexops-db-url
+                  key: latest
+            - name: REDIS_BROKER_URL
+              valueFrom:
+                secretKeyRef:
+                  name: vertexops-redis-broker-url
+                  key: latest
+            - name: CELERY_RESULT_BACKEND
+              valueFrom:
+                secretKeyRef:
+                  name: vertexops-redis-result-url
+                  key: latest
+            - name: JWT_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: vertexops-jwt-secret
+                  key: latest
+            - name: API_KEY_PEPPER
+              valueFrom:
+                secretKeyRef:
+                  name: vertexops-api-key-pepper
+                  key: latest
