@@ -1,7 +1,7 @@
 """EvalCase ORM model."""
 
 import uuid
-from typing import TYPE_CHECKING, Any, Dict, Optional
+from typing import TYPE_CHECKING, Any, Optional
 
 from sqlalchemy import ForeignKey, Index, String, Text
 from sqlalchemy.dialects.postgresql import JSONB, UUID
@@ -24,9 +24,7 @@ class EvalCase(UUIDPrimaryKeyMixin, Base):
     question: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     ground_truth: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     predicted: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    case_metrics: Mapped[Optional[Dict[str, Any]]] = mapped_column(
-        "metrics", JSONB, nullable=True
-    )
+    case_metrics: Mapped[Optional[dict[str, Any]]] = mapped_column("metrics", JSONB, nullable=True)
     failure_type: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
 
     run: Mapped["Run"] = relationship(

@@ -2,7 +2,7 @@
 
 import uuid
 from datetime import datetime
-from typing import TYPE_CHECKING, Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, Optional
 
 from sqlalchemy import DateTime, ForeignKey, Index, String, Text
 from sqlalchemy.dialects.postgresql import JSONB, UUID
@@ -11,8 +11,8 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from backend.models.base import Base, UUIDPrimaryKeyMixin
 
 if TYPE_CHECKING:
-    from backend.models.experiment import Experiment
     from backend.models.eval_case import EvalCase
+    from backend.models.experiment import Experiment
     from backend.models.metric_snapshot import MetricSnapshot
 
 
@@ -24,32 +24,24 @@ class Run(UUIDPrimaryKeyMixin, Base):
         ForeignKey("experiments.id", ondelete="CASCADE"),
         nullable=False,
     )
-    status: Mapped[str] = mapped_column(
-        String(32), nullable=False, default="queued"
-    )
-    started_at: Mapped[Optional[datetime]] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
-    finished_at: Mapped[Optional[datetime]] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
+    status: Mapped[str] = mapped_column(String(32), nullable=False, default="queued")
+    started_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    finished_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
     artifact_uri: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    run_logs: Mapped[Optional[Dict[str, Any]]] = mapped_column(
-        "logs", JSONB, nullable=True
-    )
+    run_logs: Mapped[Optional[dict[str, Any]]] = mapped_column("logs", JSONB, nullable=True)
 
     experiment: Mapped["Experiment"] = relationship(
         "Experiment",
         back_populates="runs",
         lazy="select",
     )
-    eval_cases: Mapped[List["EvalCase"]] = relationship(
+    eval_cases: Mapped[list["EvalCase"]] = relationship(
         "EvalCase",
         back_populates="run",
         cascade="all, delete-orphan",
         lazy="select",
     )
-    metric_snapshots: Mapped[List["MetricSnapshot"]] = relationship(
+    metric_snapshots: Mapped[list["MetricSnapshot"]] = relationship(
         "MetricSnapshot",
         back_populates="run",
         cascade="all, delete-orphan",

@@ -2,14 +2,12 @@
 
 import re
 from dataclasses import dataclass
-from typing import List, Optional
-
 
 # ---------------------------------------------------------------------------
 # Injection detection
 # ---------------------------------------------------------------------------
 
-_INJECTION_PATTERNS: List[re.Pattern] = [
+_INJECTION_PATTERNS: list[re.Pattern] = [
     # Classic role override attempts
     re.compile(r"ignore\s+(all\s+)?(previous|prior|above)\s+instructions?", re.IGNORECASE),
     re.compile(r"disregard\s+(all\s+)?(previous|prior|above)\s+instructions?", re.IGNORECASE),
@@ -32,14 +30,14 @@ _INJECTION_PATTERNS: List[re.Pattern] = [
 class GuardrailResult:
     is_safe: bool
     risk_level: str  # "none" | "low" | "medium" | "high"
-    reasons: List[str]
+    reasons: list[str]
 
     @classmethod
     def safe(cls) -> "GuardrailResult":
         return cls(is_safe=True, risk_level="none", reasons=[])
 
     @classmethod
-    def unsafe(cls, reasons: List[str], risk_level: str = "high") -> "GuardrailResult":
+    def unsafe(cls, reasons: list[str], risk_level: str = "high") -> "GuardrailResult":
         return cls(is_safe=False, risk_level=risk_level, reasons=reasons)
 
 
@@ -48,7 +46,7 @@ def check_injection(text: str) -> GuardrailResult:
 
     Returns GuardrailResult(is_safe=False) if any pattern fires.
     """
-    reasons: List[str] = []
+    reasons: list[str] = []
     for pattern in _INJECTION_PATTERNS:
         if pattern.search(text):
             reasons.append(f"Matched injection pattern: {pattern.pattern[:60]}")
@@ -79,7 +77,7 @@ def sanitize_chunk(text: str) -> str:
     return text
 
 
-def sanitize_chunks(chunks: List[str]) -> List[str]:
+def sanitize_chunks(chunks: list[str]) -> list[str]:
     return [sanitize_chunk(c) for c in chunks]
 
 
@@ -87,18 +85,18 @@ def sanitize_chunks(chunks: List[str]) -> List[str]:
 # Output safety
 # ---------------------------------------------------------------------------
 
-_UNSAFE_OUTPUT_PATTERNS: List[re.Pattern] = [
+_UNSAFE_OUTPUT_PATTERNS: list[re.Pattern] = [
     # Potential credential leakage
     re.compile(r"\b(?:password|secret|api[_\s]?key)\s*[:=]\s*\S+", re.IGNORECASE),
     # PII patterns — SSN, credit card (simplified)
-    re.compile(r"\b\d{3}-\d{2}-\d{4}\b"),                   # SSN
+    re.compile(r"\b\d{3}-\d{2}-\d{4}\b"),  # SSN
     re.compile(r"\b(?:4\d{12}(?:\d{3})?|5[1-5]\d{14})\b"),  # Visa/MC (rough)
 ]
 
 
 def check_output_safety(answer: str) -> GuardrailResult:
     """Scan generated answer for potentially unsafe content."""
-    reasons: List[str] = []
+    reasons: list[str] = []
     for pattern in _UNSAFE_OUTPUT_PATTERNS:
         if pattern.search(answer):
             reasons.append(f"Potential unsafe output: {pattern.pattern[:60]}")

@@ -2,7 +2,7 @@
 
 import logging
 import time
-from typing import NamedTuple, Optional, Tuple
+from typing import NamedTuple, Optional
 
 import redis.asyncio as aioredis
 
@@ -55,9 +55,7 @@ class RateLimiter:
             )
         return self._client
 
-    async def is_allowed(
-        self, key: str, policy: RateLimitPolicy
-    ) -> Tuple[bool, int, int]:
+    async def is_allowed(self, key: str, policy: RateLimitPolicy) -> tuple[bool, int, int]:
         """Check whether *key* is within *policy* for the current window.
 
         Returns ``(allowed, remaining, reset_at_unix)``.

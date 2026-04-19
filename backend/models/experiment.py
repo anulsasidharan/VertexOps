@@ -1,7 +1,7 @@
 """Experiment ORM model."""
 
 import uuid
-from typing import TYPE_CHECKING, Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, Optional
 
 from sqlalchemy import ForeignKey, Index, String, Text
 from sqlalchemy.dialects.postgresql import JSONB, UUID
@@ -29,7 +29,7 @@ class Experiment(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     )
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    experiment_config: Mapped[Optional[Dict[str, Any]]] = mapped_column(
+    experiment_config: Mapped[Optional[dict[str, Any]]] = mapped_column(
         "config", JSONB, nullable=True
     )
     config_hash: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
@@ -39,7 +39,7 @@ class Experiment(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         back_populates="experiments",
         lazy="select",
     )
-    runs: Mapped[List["Run"]] = relationship(
+    runs: Mapped[list["Run"]] = relationship(
         "Run",
         back_populates="experiment",
         cascade="all, delete-orphan",

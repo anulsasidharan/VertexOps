@@ -62,7 +62,10 @@ def test_twilio_eval_sms(mock_sms):
     assert "r9" in mock_sms.call_args.kwargs["body"]
 
 
-@patch("backend.integrations.notifications.service.send_email_sendgrid", side_effect=RuntimeError("down"))
+@patch(
+    "backend.integrations.notifications.service.send_email_sendgrid",
+    side_effect=RuntimeError("down"),
+)
 def test_sendgrid_failure_does_not_raise(mock_sg):
     settings = MagicMock()
     settings.notifications_enabled = True

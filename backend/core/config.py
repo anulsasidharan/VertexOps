@@ -1,7 +1,7 @@
 """Application settings — typed configuration via pydantic-settings."""
 
 from functools import lru_cache
-from typing import List, Literal, Optional
+from typing import Literal, Optional
 
 from pydantic import SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -22,7 +22,7 @@ class Settings(BaseSettings):
     app_name: str = "VertexOps"
     app_version: str = "0.1.0"
     debug: bool = False
-    cors_origins: List[str] = ["http://localhost:3000", "http://localhost:5173"]
+    cors_origins: list[str] = ["http://localhost:3000", "http://localhost:5173"]
 
     # -------------------------------------------------------------------------
     # Database (PostgreSQL)
@@ -124,7 +124,7 @@ class Settings(BaseSettings):
     # -------------------------------------------------------------------------
     @field_validator("cors_origins", mode="before")
     @classmethod
-    def parse_cors_origins(cls, value: object) -> List[str]:
+    def parse_cors_origins(cls, value: object) -> list[str]:
         if isinstance(value, str):
             return [origin.strip() for origin in value.split(",") if origin.strip()]
         return value  # type: ignore[return-value]
@@ -133,9 +133,7 @@ class Settings(BaseSettings):
     def validate_production_requirements(self) -> "Settings":
         if self.app_env == "production":
             if not self.openai_api_key and not self.gcp_project_id:
-                raise ValueError(
-                    "Production requires either OPENAI_API_KEY or GCP_PROJECT_ID"
-                )
+                raise ValueError("Production requires either OPENAI_API_KEY or GCP_PROJECT_ID")
             if self.debug:
                 raise ValueError("DEBUG must be False in production")
         return self

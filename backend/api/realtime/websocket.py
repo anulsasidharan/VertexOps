@@ -1,7 +1,6 @@
 """WebSocket endpoints for streaming query responses and job status updates."""
 
 import logging
-import uuid
 from typing import Optional
 
 from fastapi import APIRouter, Query, WebSocket, WebSocketDisconnect

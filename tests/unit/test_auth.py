@@ -1,12 +1,9 @@
 """Unit tests for security primitives, auth dependency, and RBAC role checks."""
 
 import uuid
-from datetime import datetime, timedelta, timezone
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from fastapi import FastAPI
-from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.api.dependencies.auth import AuthContext, get_current_user, require_role
@@ -22,7 +19,6 @@ from backend.core.security import (
 )
 from backend.models.api_key import APIKey
 from backend.models.user import User
-
 
 # ---------------------------------------------------------------------------
 # Security — password hashing
@@ -196,9 +192,7 @@ async def test_get_current_user_jwt_success(mock_db: AsyncMock):
         "backend.api.dependencies.auth.get_settings",
         return_value=_make_settings_mock(),
     ):
-        ctx = await get_current_user(
-            credentials=mock_credentials, x_api_key=None, db=mock_db
-        )
+        ctx = await get_current_user(credentials=mock_credentials, x_api_key=None, db=mock_db)
 
     assert ctx.user_id == uid
     assert ctx.role == "admin"
@@ -217,9 +211,7 @@ async def test_get_current_user_jwt_expired(mock_db: AsyncMock):
         return_value=_make_settings_mock(),
     ):
         with pytest.raises(UnauthorizedError, match="expired"):
-            await get_current_user(
-                credentials=mock_credentials, x_api_key=None, db=mock_db
-            )
+            await get_current_user(credentials=mock_credentials, x_api_key=None, db=mock_db)
 
 
 @pytest.mark.asyncio
@@ -266,19 +258,13 @@ async def test_get_current_user_api_key_success(mock_db: AsyncMock):
 
     with (
         patch("backend.api.dependencies.auth.get_settings", return_value=settings_mock),
-        patch(
-            "backend.api.dependencies.auth.APIKeyRepository"
-        ) as MockAPIKeyRepo,
-        patch(
-            "backend.api.dependencies.auth.UserRepository"
-        ) as MockUserRepo,
+        patch("backend.api.dependencies.auth.APIKeyRepository") as MockAPIKeyRepo,
+        patch("backend.api.dependencies.auth.UserRepository") as MockUserRepo,
     ):
         MockAPIKeyRepo.return_value.get_by_hash = AsyncMock(return_value=api_key_obj)
         MockUserRepo.return_value.get = AsyncMock(return_value=user_obj)
 
-        ctx = await get_current_user(
-            credentials=None, x_api_key=raw_key, db=mock_db
-        )
+        ctx = await get_current_user(credentials=None, x_api_key=raw_key, db=mock_db)
 
     assert ctx.user_id == uid
     assert ctx.role == "member"
@@ -291,16 +277,12 @@ async def test_get_current_user_invalid_api_key_raises(mock_db: AsyncMock):
 
     with (
         patch("backend.api.dependencies.auth.get_settings", return_value=settings_mock),
-        patch(
-            "backend.api.dependencies.auth.APIKeyRepository"
-        ) as MockAPIKeyRepo,
+        patch("backend.api.dependencies.auth.APIKeyRepository") as MockAPIKeyRepo,
     ):
         MockAPIKeyRepo.return_value.get_by_hash = AsyncMock(return_value=None)
 
         with pytest.raises(UnauthorizedError, match="Invalid API key"):
-            await get_current_user(
-                credentials=None, x_api_key="vops_bad_key", db=mock_db
-            )
+            await get_current_user(credentials=None, x_api_key="vops_bad_key", db=mock_db)
 
 
 @pytest.mark.asyncio
@@ -316,20 +298,14 @@ async def test_get_current_user_api_key_user_not_found_raises(mock_db: AsyncMock
 
     with (
         patch("backend.api.dependencies.auth.get_settings", return_value=settings_mock),
-        patch(
-            "backend.api.dependencies.auth.APIKeyRepository"
-        ) as MockAPIKeyRepo,
-        patch(
-            "backend.api.dependencies.auth.UserRepository"
-        ) as MockUserRepo,
+        patch("backend.api.dependencies.auth.APIKeyRepository") as MockAPIKeyRepo,
+        patch("backend.api.dependencies.auth.UserRepository") as MockUserRepo,
     ):
         MockAPIKeyRepo.return_value.get_by_hash = AsyncMock(return_value=api_key_obj)
         MockUserRepo.return_value.get = AsyncMock(return_value=None)
 
         with pytest.raises(UnauthorizedError, match="owner not found"):
-            await get_current_user(
-                credentials=None, x_api_key=raw_key, db=mock_db
-            )
+            await get_current_user(credentials=None, x_api_key=raw_key, db=mock_db)
 
 
 # ---------------------------------------------------------------------------

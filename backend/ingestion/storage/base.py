@@ -2,9 +2,7 @@
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Dict
 from uuid import UUID
-
 
 # ---------------------------------------------------------------------------
 # Shared data types
@@ -23,7 +21,7 @@ class UploadSpec:
     storage_key: str
     storage_uri: str
     method: str = "PUT"
-    headers: Dict[str, str] = field(default_factory=dict)
+    headers: dict[str, str] = field(default_factory=dict)
     expires_in: int = 3600
 
 

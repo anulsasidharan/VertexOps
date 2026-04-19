@@ -9,7 +9,9 @@ def test_record_usage_event_noop_when_disabled():
     settings = MagicMock()
     settings.stripe_metering_enabled = False
     with patch("backend.integrations.billing.service.get_settings", return_value=settings):
-        with patch("backend.integrations.billing.service.stripe_client.post_meter_usage") as mock_post:
+        with patch(
+            "backend.integrations.billing.service.stripe_client.post_meter_usage"
+        ) as mock_post:
             record_usage_event("query_completion", 10.0, metadata={"user_id": "u1"})
     mock_post.assert_not_called()
 
@@ -20,7 +22,9 @@ def test_record_usage_event_noop_when_enabled_but_no_key():
     settings.stripe_api_key = None
     settings.stripe_meter_event_name = None
     with patch("backend.integrations.billing.service.get_settings", return_value=settings):
-        with patch("backend.integrations.billing.service.stripe_client.post_meter_usage") as mock_post:
+        with patch(
+            "backend.integrations.billing.service.stripe_client.post_meter_usage"
+        ) as mock_post:
             record_usage_event("eval_completion", 1.0)
     mock_post.assert_not_called()
 
@@ -48,7 +52,10 @@ def test_record_usage_event_calls_stripe_when_configured(mock_post):
     assert kwargs["metadata"]["stripe_customer_id"] == "cus_abc"
 
 
-@patch("backend.integrations.billing.service.stripe_client.post_meter_usage", side_effect=RuntimeError("network"))
+@patch(
+    "backend.integrations.billing.service.stripe_client.post_meter_usage",
+    side_effect=RuntimeError("network"),
+)
 def test_record_usage_event_swallows_stripe_errors(mock_post):
     settings = MagicMock()
     settings.stripe_metering_enabled = True

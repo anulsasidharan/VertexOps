@@ -1,7 +1,7 @@
 """Document ORM model."""
 
 import uuid
-from typing import TYPE_CHECKING, Dict, Any, List, Optional
+from typing import TYPE_CHECKING, Any, Optional
 
 from sqlalchemy import ForeignKey, Index, String, Text
 from sqlalchemy.dialects.postgresql import JSONB, UUID
@@ -26,14 +26,10 @@ class Document(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     format: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)
     language: Mapped[Optional[str]] = mapped_column(String(16), nullable=True)
     content_hash: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)
-    ingest_status: Mapped[str] = mapped_column(
-        String(32), nullable=False, default="pending"
-    )
-    doc_metadata: Mapped[Optional[Dict[str, Any]]] = mapped_column(
-        "metadata", JSONB, nullable=True
-    )
+    ingest_status: Mapped[str] = mapped_column(String(32), nullable=False, default="pending")
+    doc_metadata: Mapped[Optional[dict[str, Any]]] = mapped_column("metadata", JSONB, nullable=True)
 
-    chunks: Mapped[List["Chunk"]] = relationship(
+    chunks: Mapped[list["Chunk"]] = relationship(
         "Chunk",
         back_populates="document",
         cascade="all, delete-orphan",
@@ -47,6 +43,4 @@ class Document(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     )
 
     def __repr__(self) -> str:
-        return (
-            f"<Document id={self.id} status={self.ingest_status!r} title={self.title!r}>"
-        )
+        return f"<Document id={self.id} status={self.ingest_status!r} title={self.title!r}>"

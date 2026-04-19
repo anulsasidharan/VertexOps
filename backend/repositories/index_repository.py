@@ -1,6 +1,6 @@
 """Repository for VectorIndex aggregate."""
 
-from typing import List, Optional
+from typing import Optional
 from uuid import UUID
 
 from sqlalchemy import select
@@ -16,16 +16,14 @@ class IndexRepository(BaseRepository[VectorIndex]):
     def __init__(self, session: AsyncSession) -> None:
         super().__init__(session)
 
-    async def list_by_workspace(self, workspace_id: UUID) -> List[VectorIndex]:
+    async def list_by_workspace(self, workspace_id: UUID) -> list[VectorIndex]:
         result = await self.session.execute(
             select(VectorIndex).where(VectorIndex.workspace_id == workspace_id)
         )
         return list(result.scalars().all())
 
-    async def list_by_status(self, status: str) -> List[VectorIndex]:
-        result = await self.session.execute(
-            select(VectorIndex).where(VectorIndex.status == status)
-        )
+    async def list_by_status(self, status: str) -> list[VectorIndex]:
+        result = await self.session.execute(select(VectorIndex).where(VectorIndex.status == status))
         return list(result.scalars().all())
 
     async def get_by_config_hash(self, config_hash: str) -> Optional[VectorIndex]:

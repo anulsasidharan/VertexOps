@@ -7,16 +7,15 @@ import pytest
 
 from backend.evaluation.datasets import build_synthetic_eval_cases_from_chunk_texts
 from backend.evaluation.metrics import (
-    AggregateMetrics,
     CaseMetrics,
     aggregate_case_metrics,
     compute_case_metrics,
 )
 
-
 # ---------------------------------------------------------------------------
 # compute_case_metrics
 # ---------------------------------------------------------------------------
+
 
 def test_build_synthetic_eval_cases_from_chunk_texts():
     rows = build_synthetic_eval_cases_from_chunk_texts(
@@ -73,8 +72,12 @@ def test_compute_case_metrics_low_overlap_flags_failure():
 
 def test_compute_case_metrics_cost_calculation():
     m = compute_case_metrics(
-        question="Q?", predicted="A.", ground_truth=None, context=None,
-        token_count=1000, cost_per_1k_tokens=0.002,
+        question="Q?",
+        predicted="A.",
+        ground_truth=None,
+        context=None,
+        token_count=1000,
+        cost_per_1k_tokens=0.002,
     )
     assert abs(m.cost_usd - 0.002) < 1e-6
 
@@ -97,6 +100,7 @@ def test_compute_case_metrics_no_context_zero_faithfulness():
 # aggregate_case_metrics
 # ---------------------------------------------------------------------------
 
+
 def test_aggregate_empty_cases():
     agg = aggregate_case_metrics([])
     assert agg.case_count == 0
@@ -106,8 +110,12 @@ def test_aggregate_empty_cases():
 
 def test_aggregate_all_passing():
     cases = [
-        CaseMetrics(relevance=0.8, faithfulness=0.7, latency_ms=100, token_count=50, cost_usd=0.001),
-        CaseMetrics(relevance=0.6, faithfulness=0.5, latency_ms=200, token_count=80, cost_usd=0.002),
+        CaseMetrics(
+            relevance=0.8, faithfulness=0.7, latency_ms=100, token_count=50, cost_usd=0.001
+        ),
+        CaseMetrics(
+            relevance=0.6, faithfulness=0.5, latency_ms=200, token_count=80, cost_usd=0.002
+        ),
     ]
     agg = aggregate_case_metrics(cases)
     assert agg.case_count == 2
@@ -127,7 +135,7 @@ def test_aggregate_with_failures():
     ]
     agg = aggregate_case_metrics(cases)
     assert agg.failure_count == 2
-    assert abs(agg.failure_rate - 2/3) < 0.001
+    assert abs(agg.failure_rate - 2 / 3) < 0.001
     assert agg.failure_breakdown["empty_response"] == 1
     assert agg.failure_breakdown["low_overlap"] == 1
 
@@ -148,6 +156,7 @@ def test_aggregate_to_dict_keys():
 # CaseMetrics.to_dict
 # ---------------------------------------------------------------------------
 
+
 def test_case_metrics_to_dict():
     m = CaseMetrics(relevance=0.8, faithfulness=0.6, latency_ms=50, token_count=10, cost_usd=0.001)
     d = m.to_dict()
@@ -160,6 +169,7 @@ def test_case_metrics_to_dict():
 # ---------------------------------------------------------------------------
 # EvaluationService (mock-based)
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.asyncio
 async def test_evaluation_service_add_case():
@@ -226,11 +236,23 @@ async def test_evaluation_service_compute_aggregate():
     mock_snap_repo = MagicMock()
 
     case1 = MagicMock()
-    case1.case_metrics = {"relevance": 0.8, "faithfulness": 0.7, "latency_ms": 100,
-                          "token_count": 50, "cost_usd": 0.001, "failure_type": None}
+    case1.case_metrics = {
+        "relevance": 0.8,
+        "faithfulness": 0.7,
+        "latency_ms": 100,
+        "token_count": 50,
+        "cost_usd": 0.001,
+        "failure_type": None,
+    }
     case2 = MagicMock()
-    case2.case_metrics = {"relevance": 0.6, "faithfulness": 0.5, "latency_ms": 200,
-                          "token_count": 80, "cost_usd": 0.002, "failure_type": "low_overlap"}
+    case2.case_metrics = {
+        "relevance": 0.6,
+        "faithfulness": 0.5,
+        "latency_ms": 200,
+        "token_count": 80,
+        "cost_usd": 0.002,
+        "failure_type": "low_overlap",
+    }
 
     mock_case_repo.list_by_run = AsyncMock(return_value=[case1, case2])
     mock_snap_repo.add = AsyncMock(side_effect=lambda x: x)

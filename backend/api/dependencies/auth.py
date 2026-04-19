@@ -36,15 +36,12 @@ class AuthContext:
 
     def __repr__(self) -> str:
         return (
-            f"<AuthContext user_id={self.user_id} role={self.role!r} "
-            f"auth_type={self.auth_type!r}>"
+            f"<AuthContext user_id={self.user_id} role={self.role!r} auth_type={self.auth_type!r}>"
         )
 
 
 async def get_current_user(
-    credentials: Annotated[
-        Optional[HTTPAuthorizationCredentials], Security(_bearer_scheme)
-    ] = None,
+    credentials: Annotated[Optional[HTTPAuthorizationCredentials], Security(_bearer_scheme)] = None,
     x_api_key: Annotated[Optional[str], Header(alias="X-API-Key")] = None,
     db: AsyncSession = Depends(get_db),
 ) -> AuthContext:

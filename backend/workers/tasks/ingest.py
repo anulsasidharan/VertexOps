@@ -23,7 +23,9 @@ def parse_document(self, document_id: str, workspace_id: str) -> dict:
     logger.info("parse_document: doc=%s ws=%s", document_id, workspace_id)
     try:
         import asyncio
+
         from backend.workers._runner import run_parse_document
+
         result = asyncio.run(run_parse_document(UUID(document_id), UUID(workspace_id)))
         return result
     except Exception as exc:

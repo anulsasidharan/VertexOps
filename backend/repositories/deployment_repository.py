@@ -1,6 +1,5 @@
 """Repository for Deployment aggregate."""
 
-from typing import List
 from uuid import UUID
 
 from sqlalchemy import select
@@ -16,21 +15,17 @@ class DeploymentRepository(BaseRepository[Deployment]):
     def __init__(self, session: AsyncSession) -> None:
         super().__init__(session)
 
-    async def list_by_workspace(self, workspace_id: UUID) -> List[Deployment]:
+    async def list_by_workspace(self, workspace_id: UUID) -> list[Deployment]:
         result = await self.session.execute(
             select(Deployment).where(Deployment.workspace_id == workspace_id)
         )
         return list(result.scalars().all())
 
-    async def list_by_status(self, status: str) -> List[Deployment]:
-        result = await self.session.execute(
-            select(Deployment).where(Deployment.status == status)
-        )
+    async def list_by_status(self, status: str) -> list[Deployment]:
+        result = await self.session.execute(select(Deployment).where(Deployment.status == status))
         return list(result.scalars().all())
 
-    async def list_by_environment(
-        self, workspace_id: UUID, environment: str
-    ) -> List[Deployment]:
+    async def list_by_environment(self, workspace_id: UUID, environment: str) -> list[Deployment]:
         result = await self.session.execute(
             select(Deployment).where(
                 Deployment.workspace_id == workspace_id,

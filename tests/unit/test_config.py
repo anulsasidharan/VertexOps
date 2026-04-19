@@ -1,7 +1,5 @@
 """Unit tests for backend.core.config."""
 
-import os
-
 import pytest
 from pydantic import ValidationError
 

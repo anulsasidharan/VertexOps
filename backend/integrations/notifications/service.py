@@ -1,7 +1,7 @@
 """Dispatch optional email/SMS notifications — failures are swallowed."""
 
 import logging
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 from backend.core.config import get_settings
 from backend.integrations.notifications import templates
@@ -11,7 +11,7 @@ from backend.integrations.notifications.twilio_client import send_sms_twilio
 logger = logging.getLogger(__name__)
 
 
-def dispatch_notification(event_type: str, payload: Dict[str, Any]) -> None:
+def dispatch_notification(event_type: str, payload: dict[str, Any]) -> None:
     """Fan out a product event to enabled channels. Never raises to callers."""
     settings = get_settings()
     if not settings.notifications_enabled:
@@ -28,14 +28,14 @@ def dispatch_notification(event_type: str, payload: Dict[str, Any]) -> None:
         logger.warning("Twilio notification skipped/failed: %s", exc, exc_info=False)
 
 
-def _alert_emails(settings) -> List[str]:
+def _alert_emails(settings) -> list[str]:
     raw = settings.notification_alert_emails
     if isinstance(raw, str) and raw.strip():
         return [e.strip() for e in raw.split(",") if e.strip()]
     return []
 
 
-def _dispatch_sendgrid(event_type: str, payload: Dict[str, Any], settings) -> None:
+def _dispatch_sendgrid(event_type: str, payload: dict[str, Any], settings) -> None:
     if not settings.notifications_sendgrid_enabled:
         return
     key = settings.sendgrid_api_key
@@ -57,7 +57,7 @@ def _dispatch_sendgrid(event_type: str, payload: Dict[str, Any], settings) -> No
     )
 
 
-def _dispatch_twilio(event_type: str, payload: Dict[str, Any], settings) -> None:
+def _dispatch_twilio(event_type: str, payload: dict[str, Any], settings) -> None:
     if not settings.notifications_twilio_enabled:
         return
     sid = settings.twilio_account_sid
@@ -77,7 +77,7 @@ def _dispatch_twilio(event_type: str, payload: Dict[str, Any], settings) -> None
     )
 
 
-def _email_for_event(event_type: str, payload: Dict[str, Any]) -> Tuple[str, str]:
+def _email_for_event(event_type: str, payload: dict[str, Any]) -> tuple[str, str]:
     if event_type == "eval_completed":
         return templates.eval_completed_email(payload)
     if event_type == "deployment_changed":
@@ -87,7 +87,7 @@ def _email_for_event(event_type: str, payload: Dict[str, Any]) -> Tuple[str, str
     return f"[VertexOps] {event_type}", str(payload)
 
 
-def _sms_for_event(event_type: str, payload: Dict[str, Any]) -> str:
+def _sms_for_event(event_type: str, payload: dict[str, Any]) -> str:
     if event_type == "eval_completed":
         return templates.eval_completed_sms(payload)
     return f"VertexOps: {event_type}"

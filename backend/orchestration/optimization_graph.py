@@ -1,6 +1,6 @@
 """LangGraph workflow for bounded strategy updates and rollback."""
 
-from typing import Any, Callable, Dict, Optional, TypedDict
+from typing import Any, Callable, Optional, TypedDict
 
 from langgraph.graph import END, START, StateGraph
 
@@ -10,11 +10,11 @@ class OptimizationState(TypedDict, total=False):
 
     iteration: int
     max_iterations: int
-    current_config: Dict[str, Any]
-    best_config: Dict[str, Any]
+    current_config: dict[str, Any]
+    best_config: dict[str, Any]
     best_score: float
     trial_score: float
-    failure_breakdown: Dict[str, int]
+    failure_breakdown: dict[str, int]
     last_strategy: str
     rollback_reason: str
     failure_category: str
@@ -30,9 +30,7 @@ def _default_failure_category(state: OptimizationState) -> str:
     return max(fb.items(), key=lambda kv: kv[1])[0]
 
 
-def _analyze_failures(
-    state: OptimizationState, strategy_fn: StrategyFn
-) -> OptimizationState:
+def _analyze_failures(state: OptimizationState, strategy_fn: StrategyFn) -> OptimizationState:
     cat = _default_failure_category(state)
     if strategy_fn is not None:
         strat = strategy_fn(state)

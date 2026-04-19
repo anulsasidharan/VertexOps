@@ -1,8 +1,7 @@
 """Integration and contract tests for WebSocket realtime endpoints."""
 
-import json
 import uuid
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 from fastapi.testclient import TestClient
@@ -109,6 +108,7 @@ def test_ws_jobs_rejects_missing_token():
 
 def test_ws_query_accepts_valid_token():
     from unittest.mock import patch as _patch
+
     # Patch auth to return a valid user_id
     with _patch("backend.api.realtime.websocket._authenticate_ws", return_value="user-123"):
         with TestClient(app) as client:
@@ -120,6 +120,7 @@ def test_ws_query_accepts_valid_token():
 
 def test_ws_jobs_accepts_valid_token():
     from unittest.mock import patch as _patch
+
     with _patch("backend.api.realtime.websocket._authenticate_ws", return_value="user-123"):
         with TestClient(app) as client:
             with client.websocket_connect(f"/ws/jobs/{_JOB_ID}?token=fake") as ws:
@@ -130,6 +131,7 @@ def test_ws_jobs_accepts_valid_token():
 
 def test_ws_query_ping_pong():
     from unittest.mock import patch as _patch
+
     with _patch("backend.api.realtime.websocket._authenticate_ws", return_value="user-123"):
         with TestClient(app) as client:
             with client.websocket_connect(f"/ws/query/{_SESSION_ID}?token=fake") as ws:
@@ -141,6 +143,7 @@ def test_ws_query_ping_pong():
 
 def test_ws_jobs_ping_pong():
     from unittest.mock import patch as _patch
+
     with _patch("backend.api.realtime.websocket._authenticate_ws", return_value="user-123"):
         with TestClient(app) as client:
             with client.websocket_connect(f"/ws/jobs/{_JOB_ID}?token=fake") as ws:

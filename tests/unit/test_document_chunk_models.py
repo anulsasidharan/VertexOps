@@ -11,7 +11,6 @@ from backend.models.document import Document
 from backend.repositories.chunk_repository import ChunkRepository
 from backend.repositories.document_repository import DocumentRepository
 
-
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
@@ -67,8 +66,16 @@ def test_document_table_name():
 def test_document_columns_exist():
     cols = {c.key for c in Document.__table__.columns}
     assert cols >= {
-        "id", "workspace_id", "title", "source_uri", "format", "language",
-        "content_hash", "ingest_status", "created_at", "updated_at",
+        "id",
+        "workspace_id",
+        "title",
+        "source_uri",
+        "format",
+        "language",
+        "content_hash",
+        "ingest_status",
+        "created_at",
+        "updated_at",
     }
 
 
@@ -108,8 +115,14 @@ def test_chunk_table_name():
 def test_chunk_columns_exist():
     cols = {c.key for c in Chunk.__table__.columns}
     assert cols >= {
-        "id", "document_id", "chunk_index", "text", "token_count",
-        "section_path", "vector_id", "created_at",
+        "id",
+        "document_id",
+        "chunk_index",
+        "text",
+        "token_count",
+        "section_path",
+        "vector_id",
+        "created_at",
     }
 
 
@@ -170,9 +183,7 @@ async def test_document_repo_delete(document: Document, mock_session: AsyncMock)
 
 
 @pytest.mark.asyncio
-async def test_document_repo_get_by_content_hash_found(
-    document: Document, mock_session: AsyncMock
-):
+async def test_document_repo_get_by_content_hash_found(document: Document, mock_session: AsyncMock):
     _setup_scalar_first(mock_session, document)
     repo = DocumentRepository(mock_session)
 
@@ -201,9 +212,7 @@ async def test_document_repo_list_by_workspace(
 
 
 @pytest.mark.asyncio
-async def test_document_repo_list_by_status(
-    document: Document, mock_session: AsyncMock
-):
+async def test_document_repo_list_by_status(document: Document, mock_session: AsyncMock):
     _setup_scalars_all(mock_session, [document])
     repo = DocumentRepository(mock_session)
 
@@ -277,9 +286,7 @@ async def test_chunk_repo_list_by_document(
 
 
 @pytest.mark.asyncio
-async def test_chunk_repo_list_by_document_empty(
-    document: Document, mock_session: AsyncMock
-):
+async def test_chunk_repo_list_by_document_empty(document: Document, mock_session: AsyncMock):
     _setup_scalars_all(mock_session, [])
     repo = ChunkRepository(mock_session)
 
@@ -288,9 +295,7 @@ async def test_chunk_repo_list_by_document_empty(
 
 
 @pytest.mark.asyncio
-async def test_chunk_repo_delete_by_document(
-    document: Document, mock_session: AsyncMock
-):
+async def test_chunk_repo_delete_by_document(document: Document, mock_session: AsyncMock):
     execute_result = MagicMock()
     execute_result.rowcount = 3
     mock_session.execute = AsyncMock(return_value=execute_result)

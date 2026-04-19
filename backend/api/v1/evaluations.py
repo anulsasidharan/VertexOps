@@ -2,7 +2,7 @@
 
 import uuid
 from datetime import datetime
-from typing import Any, Dict, List, Literal, Optional
+from typing import Any, Literal, Optional
 
 from fastapi import APIRouter, Depends, Query
 from fastapi.responses import Response
@@ -29,7 +29,7 @@ class EvaluationCaseIn(BaseModel):
 
 class EvaluationCreateRequest(BaseModel):
     experiment_id: uuid.UUID
-    cases: List[EvaluationCaseIn] = Field(..., min_length=1)
+    cases: list[EvaluationCaseIn] = Field(..., min_length=1)
 
 
 class EvaluationCreateResponse(BaseModel):
@@ -44,7 +44,7 @@ class EvaluationDetailResponse(BaseModel):
     started_at: Optional[datetime] = None
     finished_at: Optional[datetime] = None
     artifact_uri: Optional[str] = None
-    metrics: Optional[Dict[str, Any]] = None
+    metrics: Optional[dict[str, Any]] = None
 
 
 def get_evaluation_lifecycle_service(
@@ -103,14 +103,10 @@ async def get_evaluation_report(
     run = await lifecycle.get_run_for_workspace(evaluation_id, auth.workspace_id)
     logs = run.run_logs or {}
     if report_format == "html":
-        key = logs.get("artifact_html_key") or artifact_storage_key(
-            evaluation_id, "report.html"
-        )
+        key = logs.get("artifact_html_key") or artifact_storage_key(evaluation_id, "report.html")
         media_type = "text/html; charset=utf-8"
     else:
-        key = logs.get("artifact_key") or artifact_storage_key(
-            evaluation_id, "report.json"
-        )
+        key = logs.get("artifact_key") or artifact_storage_key(evaluation_id, "report.json")
         media_type = "application/json"
     storage = get_storage_backend()
     try:

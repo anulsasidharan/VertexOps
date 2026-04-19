@@ -3,8 +3,6 @@
 import json
 import logging
 
-import pytest
-
 from backend.core.logging import (
     JSONFormatter,
     auth_subject_var,
@@ -85,6 +83,7 @@ class TestJSONFormatter:
             raise ValueError("boom")
         except ValueError:
             import sys
+
             record = _make_record("with exc", exc_info=sys.exc_info())
         out = self._parse(record)
         assert "exception" in out

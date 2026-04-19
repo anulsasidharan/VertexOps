@@ -39,9 +39,7 @@ class Chunk(UUIDPrimaryKeyMixin, Base):
         nullable=False,
     )
 
-    document: Mapped["Document"] = relationship(
-        "Document", back_populates="chunks", lazy="select"
-    )
+    document: Mapped["Document"] = relationship("Document", back_populates="chunks", lazy="select")
 
     __table_args__ = (
         Index("ix_chunks_document_id", "document_id"),
@@ -49,6 +47,4 @@ class Chunk(UUIDPrimaryKeyMixin, Base):
     )
 
     def __repr__(self) -> str:
-        return (
-            f"<Chunk id={self.id} document_id={self.document_id} index={self.chunk_index}>"
-        )
+        return f"<Chunk id={self.id} document_id={self.document_id} index={self.chunk_index}>"

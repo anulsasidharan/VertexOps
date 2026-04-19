@@ -2,7 +2,7 @@
 
 import logging
 
-from fastapi import Depends, Request, Response
+from fastapi import Request, Response
 
 from backend.core.config import get_settings
 from backend.core.exceptions import RateLimitError

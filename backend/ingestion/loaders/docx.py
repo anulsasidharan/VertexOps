@@ -12,6 +12,7 @@ def _require_docx():
     global _DOCX_AVAILABLE
     try:
         import docx  # noqa: F401
+
         _DOCX_AVAILABLE = True
         return docx
     except ImportError:

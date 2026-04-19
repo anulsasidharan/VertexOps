@@ -16,7 +16,5 @@ class WorkspaceRepository(BaseRepository[Workspace]):
         super().__init__(session)
 
     async def get_by_name(self, name: str) -> Optional[Workspace]:
-        result = await self.session.execute(
-            select(Workspace).where(Workspace.name == name)
-        )
+        result = await self.session.execute(select(Workspace).where(Workspace.name == name))
         return result.scalars().first()

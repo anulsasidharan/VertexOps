@@ -19,7 +19,6 @@ from backend.repositories.index_repository import IndexRepository
 from backend.repositories.metric_snapshot_repository import MetricSnapshotRepository
 from backend.repositories.run_repository import RunRepository
 
-
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
@@ -120,8 +119,17 @@ def test_index_table_name():
 
 def test_index_columns_exist():
     cols = {c.key for c in VectorIndex.__table__.columns}
-    assert cols >= {"id", "workspace_id", "name", "vector_backend", "namespace",
-                    "config_hash", "status", "created_at", "updated_at"}
+    assert cols >= {
+        "id",
+        "workspace_id",
+        "name",
+        "vector_backend",
+        "namespace",
+        "config_hash",
+        "status",
+        "created_at",
+        "updated_at",
+    }
 
 
 def test_index_config_column_name():
@@ -157,8 +165,15 @@ def test_experiment_table_name():
 
 def test_experiment_columns_exist():
     cols = {c.key for c in Experiment.__table__.columns}
-    assert cols >= {"id", "workspace_id", "index_id", "name", "description",
-                    "created_at", "updated_at"}
+    assert cols >= {
+        "id",
+        "workspace_id",
+        "index_id",
+        "name",
+        "description",
+        "created_at",
+        "updated_at",
+    }
 
 
 def test_experiment_config_column_name():
@@ -192,8 +207,7 @@ def test_run_table_name():
 
 def test_run_columns_exist():
     cols = {c.key for c in Run.__table__.columns}
-    assert cols >= {"id", "experiment_id", "status", "started_at", "finished_at",
-                    "artifact_uri"}
+    assert cols >= {"id", "experiment_id", "status", "started_at", "finished_at", "artifact_uri"}
 
 
 def test_run_logs_column_name():
@@ -202,8 +216,7 @@ def test_run_logs_column_name():
 
 
 def test_run_experiment_fk_cascade():
-    fk = next(fk for fk in Run.__table__.foreign_keys
-              if fk.target_fullname == "experiments.id")
+    fk = next(fk for fk in Run.__table__.foreign_keys if fk.target_fullname == "experiments.id")
     assert fk.ondelete == "CASCADE"
 
 
@@ -233,8 +246,7 @@ def test_eval_case_table_name():
 
 def test_eval_case_columns_exist():
     cols = {c.key for c in EvalCase.__table__.columns}
-    assert cols >= {"id", "run_id", "question", "ground_truth", "predicted",
-                    "failure_type"}
+    assert cols >= {"id", "run_id", "question", "ground_truth", "predicted", "failure_type"}
 
 
 def test_eval_case_metrics_column_name():
@@ -294,8 +306,15 @@ def test_deployment_table_name():
 
 def test_deployment_columns_exist():
     cols = {c.key for c in Deployment.__table__.columns}
-    assert cols >= {"id", "workspace_id", "index_id", "environment", "revision",
-                    "status", "created_at"}
+    assert cols >= {
+        "id",
+        "workspace_id",
+        "index_id",
+        "environment",
+        "revision",
+        "status",
+        "created_at",
+    }
 
 
 def test_deployment_workspace_fk():
@@ -356,9 +375,7 @@ async def test_index_repo_list_by_status(index: VectorIndex, mock_session: Async
 
 
 @pytest.mark.asyncio
-async def test_index_repo_get_by_config_hash(
-    index: VectorIndex, mock_session: AsyncMock
-):
+async def test_index_repo_get_by_config_hash(index: VectorIndex, mock_session: AsyncMock):
     _setup_scalar_first(mock_session, index)
     repo = IndexRepository(mock_session)
     result = await repo.get_by_config_hash("hash-abc")
@@ -467,9 +484,7 @@ async def test_eval_case_repo_add(eval_case: EvalCase, mock_session: AsyncMock):
 
 
 @pytest.mark.asyncio
-async def test_eval_case_repo_list_by_run(
-    eval_case: EvalCase, run: Run, mock_session: AsyncMock
-):
+async def test_eval_case_repo_list_by_run(eval_case: EvalCase, run: Run, mock_session: AsyncMock):
     _setup_scalars_all(mock_session, [eval_case])
     repo = EvalCaseRepository(mock_session)
     results = await repo.list_by_run(run.id)
@@ -477,9 +492,7 @@ async def test_eval_case_repo_list_by_run(
 
 
 @pytest.mark.asyncio
-async def test_eval_case_repo_list_by_failure_type_empty(
-    run: Run, mock_session: AsyncMock
-):
+async def test_eval_case_repo_list_by_failure_type_empty(run: Run, mock_session: AsyncMock):
     _setup_scalars_all(mock_session, [])
     repo = EvalCaseRepository(mock_session)
     results = await repo.list_by_failure_type(run.id, "hallucination")
@@ -492,9 +505,7 @@ async def test_eval_case_repo_list_by_failure_type_empty(
 
 
 @pytest.mark.asyncio
-async def test_metric_snapshot_repo_add(
-    metric_snapshot: MetricSnapshot, mock_session: AsyncMock
-):
+async def test_metric_snapshot_repo_add(metric_snapshot: MetricSnapshot, mock_session: AsyncMock):
     repo = MetricSnapshotRepository(mock_session)
     result = await repo.add(metric_snapshot)
     mock_session.add.assert_called_once_with(metric_snapshot)
@@ -535,9 +546,7 @@ async def test_deployment_repo_list_by_workspace(
 
 
 @pytest.mark.asyncio
-async def test_deployment_repo_list_by_status(
-    deployment: Deployment, mock_session: AsyncMock
-):
+async def test_deployment_repo_list_by_status(deployment: Deployment, mock_session: AsyncMock):
     _setup_scalars_all(mock_session, [deployment])
     repo = DeploymentRepository(mock_session)
     results = await repo.list_by_status("pending")

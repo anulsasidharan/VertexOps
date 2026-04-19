@@ -4,14 +4,12 @@ import uuid
 
 import pytest
 
-from backend.chunking.base import ChunkResult
 from backend.chunking.registry import ChunkingConfig, get_chunker
 from backend.chunking.service import ChunkingService
 from backend.chunking.strategies.code import CodeChunker
 from backend.chunking.strategies.fixed import FixedSizeChunker
 from backend.chunking.strategies.markdown import MarkdownChunker
 from backend.chunking.strategies.recursive import RecursiveChunker
-
 
 # ---------------------------------------------------------------------------
 # FixedSizeChunker

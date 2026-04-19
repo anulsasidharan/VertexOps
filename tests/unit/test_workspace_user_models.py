@@ -1,7 +1,7 @@
 """Unit tests for Workspace/User models and their repositories."""
 
 import uuid
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,7 +10,6 @@ from backend.models.user import User
 from backend.models.workspace import Workspace
 from backend.repositories.user_repository import UserRepository
 from backend.repositories.workspace_repository import WorkspaceRepository
-
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -64,7 +63,15 @@ def test_user_table_name():
 
 def test_user_columns_exist():
     cols = {c.key for c in User.__table__.columns}
-    assert cols >= {"id", "workspace_id", "email", "password_hash", "role", "created_at", "updated_at"}
+    assert cols >= {
+        "id",
+        "workspace_id",
+        "email",
+        "password_hash",
+        "role",
+        "created_at",
+        "updated_at",
+    }
 
 
 def test_user_email_is_unique():
@@ -211,7 +218,9 @@ async def test_user_repo_get_by_email_missing(mock_session: AsyncMock):
 
 
 @pytest.mark.asyncio
-async def test_user_repo_list_by_workspace(user: User, workspace: Workspace, mock_session: AsyncMock):
+async def test_user_repo_list_by_workspace(
+    user: User, workspace: Workspace, mock_session: AsyncMock
+):
     scalars_mock = MagicMock()
     scalars_mock.all.return_value = [user]
     execute_result = MagicMock()

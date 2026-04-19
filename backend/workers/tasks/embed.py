@@ -23,7 +23,9 @@ def embed_document_chunks(self, document_id: str, workspace_id: str) -> dict:
     logger.info("embed_document_chunks: doc=%s ws=%s", document_id, workspace_id)
     try:
         import asyncio
+
         from backend.workers._runner import run_embed_document
+
         result = asyncio.run(run_embed_document(UUID(document_id), UUID(workspace_id)))
         return result
     except Exception as exc:

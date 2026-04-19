@@ -3,15 +3,14 @@
 from __future__ import annotations
 
 import logging
-from typing import Optional
 
 from prometheus_client import (
+    CONTENT_TYPE_LATEST,
     REGISTRY,
     Counter,
     Histogram,
     Info,
     generate_latest,
-    CONTENT_TYPE_LATEST,
 )
 
 logger = logging.getLogger(__name__)
@@ -76,6 +75,7 @@ def initialise_app_info(version: str, env: str) -> None:
 # Prometheus scrape helpers
 # ---------------------------------------------------------------------------
 
+
 def get_metrics_output() -> tuple[bytes, str]:
     """Return (body, content_type) for the /metrics scrape endpoint."""
     return generate_latest(REGISTRY), CONTENT_TYPE_LATEST
@@ -85,7 +85,8 @@ def get_metrics_output() -> tuple[bytes, str]:
 # OpenTelemetry — optional; initialised only when endpoint is configured
 # ---------------------------------------------------------------------------
 
-def setup_otel(service_name: str, endpoint: Optional[str]) -> None:
+
+def setup_otel(service_name: str, endpoint: str | None) -> None:
     """Configure OTLP trace exporter when endpoint is provided."""
     if not endpoint:
         return

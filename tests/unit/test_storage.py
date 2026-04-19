@@ -2,10 +2,11 @@
 
 import uuid
 from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 
+import backend.ingestion.storage.service as svc_module
 from backend.core.exceptions import NotFoundError
 from backend.ingestion.storage.base import (
     StorageBackend,
@@ -15,8 +16,6 @@ from backend.ingestion.storage.base import (
 )
 from backend.ingestion.storage.local import LocalStorageBackend
 from backend.ingestion.storage.service import _create_backend, get_storage_backend
-import backend.ingestion.storage.service as svc_module
-
 
 # ---------------------------------------------------------------------------
 # UploadSpec

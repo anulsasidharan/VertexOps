@@ -1,14 +1,14 @@
 """Domain exception hierarchy and error envelope schema."""
 
 from enum import Enum
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 from pydantic import BaseModel
-
 
 # ---------------------------------------------------------------------------
 # Error codes — align with API_SPEC.md §1.2
 # ---------------------------------------------------------------------------
+
 
 class ErrorCode(str, Enum):
     UNAUTHORIZED = "UNAUTHORIZED"
@@ -24,10 +24,11 @@ class ErrorCode(str, Enum):
 # Error envelope — the JSON shape returned on all error responses
 # ---------------------------------------------------------------------------
 
+
 class ErrorDetail(BaseModel):
     code: str
     message: str
-    details: Dict[str, Any] = {}
+    details: dict[str, Any] = {}
 
 
 class ErrorEnvelope(BaseModel):
@@ -38,7 +39,7 @@ class ErrorEnvelope(BaseModel):
         cls,
         code: ErrorCode,
         message: str,
-        details: Optional[Dict[str, Any]] = None,
+        details: Optional[dict[str, Any]] = None,
     ) -> "ErrorEnvelope":
         return cls(error=ErrorDetail(code=code, message=message, details=details or {}))
 
@@ -46,6 +47,7 @@ class ErrorEnvelope(BaseModel):
 # ---------------------------------------------------------------------------
 # Domain exception base
 # ---------------------------------------------------------------------------
+
 
 class VertexOpsError(Exception):
     """Base for all domain-level errors.
@@ -61,11 +63,11 @@ class VertexOpsError(Exception):
     def __init__(
         self,
         message: str = "An unexpected error occurred.",
-        details: Optional[Dict[str, Any]] = None,
+        details: Optional[dict[str, Any]] = None,
     ) -> None:
         super().__init__(message)
         self.message = message
-        self.details: Dict[str, Any] = details or {}
+        self.details: dict[str, Any] = details or {}
 
     def to_envelope(self) -> ErrorEnvelope:
         return ErrorEnvelope.build(self.error_code, self.message, self.details)
@@ -74,6 +76,7 @@ class VertexOpsError(Exception):
 # ---------------------------------------------------------------------------
 # Concrete domain exceptions
 # ---------------------------------------------------------------------------
+
 
 class NotFoundError(VertexOpsError):
     status_code = 404

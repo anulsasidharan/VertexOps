@@ -1,7 +1,6 @@
 """Twilio Programmable SMS helper."""
 
 import logging
-from typing import Dict
 from urllib.parse import urlencode
 
 import httpx

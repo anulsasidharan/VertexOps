@@ -1,7 +1,6 @@
 """Chunking service — converts parsed text into Chunk model instances."""
 
 import uuid
-from typing import List
 
 from backend.chunking.registry import ChunkingConfig, get_chunker
 from backend.models.chunk import Chunk
@@ -15,7 +14,7 @@ class ChunkingService:
         document_id: uuid.UUID,
         text: str,
         config: ChunkingConfig,
-    ) -> List[Chunk]:
+    ) -> list[Chunk]:
         """Return a list of Chunk instances ready to be added to a session.
 
         Empty chunks (whitespace-only) are filtered out.

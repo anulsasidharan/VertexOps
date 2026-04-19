@@ -1,11 +1,11 @@
 """Unit tests for embedding provider interface and OpenAI adapter."""
 
+from unittest.mock import AsyncMock, MagicMock
+
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
 
 from backend.embedding.base import BaseEmbeddingProvider, EmbeddingResult
 from backend.embedding.service import EmbeddingService
-
 
 # ---------------------------------------------------------------------------
 # EmbeddingResult
@@ -13,16 +13,12 @@ from backend.embedding.service import EmbeddingService
 
 
 def test_embedding_result_dimensions_inferred():
-    result = EmbeddingResult(
-        embeddings=[[0.1, 0.2, 0.3]], model="test-model", dimensions=0
-    )
+    result = EmbeddingResult(embeddings=[[0.1, 0.2, 0.3]], model="test-model", dimensions=0)
     assert result.dimensions == 3
 
 
 def test_embedding_result_dimensions_explicit():
-    result = EmbeddingResult(
-        embeddings=[[0.1, 0.2]], model="test-model", dimensions=512
-    )
+    result = EmbeddingResult(embeddings=[[0.1, 0.2]], model="test-model", dimensions=512)
     assert result.dimensions == 512
 
 
@@ -43,6 +39,7 @@ def test_embedding_result_token_usage_default():
 
 def test_base_provider_is_abstract():
     import inspect
+
     assert inspect.isabstract(BaseEmbeddingProvider)
 
 
@@ -53,18 +50,21 @@ def test_base_provider_is_abstract():
 
 def test_openai_provider_model_name():
     from backend.embedding.providers.openai import OpenAIEmbeddingProvider
+
     p = OpenAIEmbeddingProvider(api_key="sk-test", model="text-embedding-3-small")
     assert p.model_name == "text-embedding-3-small"
 
 
 def test_openai_provider_dimensions_known_model():
     from backend.embedding.providers.openai import OpenAIEmbeddingProvider
+
     p = OpenAIEmbeddingProvider(api_key="sk-test", model="text-embedding-3-large")
     assert p.dimensions == 3072
 
 
 def test_openai_provider_dimensions_unknown_model():
     from backend.embedding.providers.openai import OpenAIEmbeddingProvider
+
     p = OpenAIEmbeddingProvider(api_key="sk-test", model="custom-model")
     assert p.dimensions == 1536  # default
 
@@ -72,6 +72,7 @@ def test_openai_provider_dimensions_unknown_model():
 @pytest.mark.asyncio
 async def test_openai_provider_embed_empty_returns_empty():
     from backend.embedding.providers.openai import OpenAIEmbeddingProvider
+
     p = OpenAIEmbeddingProvider(api_key="sk-test")
     result = await p.embed([])
     assert result.embeddings == []
@@ -121,9 +122,7 @@ async def test_openai_provider_batches_large_input():
         return resp
 
     mock_client = AsyncMock()
-    mock_client.embeddings.create = AsyncMock(
-        side_effect=lambda model, input: make_response(input)
-    )
+    mock_client.embeddings.create = AsyncMock(side_effect=lambda model, input: make_response(input))
 
     p = OpenAIEmbeddingProvider(api_key="sk-test", batch_size=3)
     p._client = mock_client
@@ -149,9 +148,7 @@ async def test_openai_provider_preserves_order():
         return resp
 
     mock_client = AsyncMock()
-    mock_client.embeddings.create = AsyncMock(
-        side_effect=lambda model, input: make_response(input)
-    )
+    mock_client.embeddings.create = AsyncMock(side_effect=lambda model, input: make_response(input))
 
     p = OpenAIEmbeddingProvider(api_key="sk-test", batch_size=10)
     p._client = mock_client
@@ -172,9 +169,7 @@ async def test_openai_provider_preserves_order():
 async def test_service_embed_texts_delegates_to_provider():
     mock_provider = AsyncMock(spec=BaseEmbeddingProvider)
     mock_provider.embed = AsyncMock(
-        return_value=EmbeddingResult(
-            embeddings=[[0.1, 0.2]], model="m", dimensions=2
-        )
+        return_value=EmbeddingResult(embeddings=[[0.1, 0.2]], model="m", dimensions=2)
     )
     mock_provider.model_name = "m"
     mock_provider.dimensions = 2
@@ -190,9 +185,7 @@ async def test_service_embed_texts_delegates_to_provider():
 async def test_service_embed_single_returns_vector():
     mock_provider = AsyncMock(spec=BaseEmbeddingProvider)
     mock_provider.embed = AsyncMock(
-        return_value=EmbeddingResult(
-            embeddings=[[0.5, 0.6, 0.7]], model="m", dimensions=3
-        )
+        return_value=EmbeddingResult(embeddings=[[0.5, 0.6, 0.7]], model="m", dimensions=3)
     )
     mock_provider.model_name = "m"
     mock_provider.dimensions = 3

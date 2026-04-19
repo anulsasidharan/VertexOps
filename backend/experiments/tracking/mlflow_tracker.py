@@ -1,7 +1,8 @@
 """Optional MLflow logging for evaluation runs — failures never propagate."""
 
 import logging
-from typing import Any, Dict, Mapping
+from collections.abc import Mapping
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +30,7 @@ def try_log_evaluation_to_mlflow(
         logger.info("mlflow package not installed; skipping tracking for run %s", run_id)
         return
 
-    flat_params: Dict[str, str] = {}
+    flat_params: dict[str, str] = {}
     for key, val in {**params, "vertexops_run_id": run_id, "experiment_id": experiment_id}.items():
         if val is None:
             continue

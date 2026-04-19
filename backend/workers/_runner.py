@@ -5,7 +5,7 @@ Each function opens its own DB session so it can run inside a sync Celery worker
 
 import logging
 import uuid
-from typing import Any, Dict
+from typing import Any
 
 from backend.chunking.registry import ChunkingConfig
 from backend.chunking.service import ChunkingService
@@ -23,7 +23,7 @@ from backend.vector_store.service import get_vector_store
 logger = logging.getLogger(__name__)
 
 
-async def run_parse_document(document_id: uuid.UUID, workspace_id: uuid.UUID) -> Dict[str, Any]:
+async def run_parse_document(document_id: uuid.UUID, workspace_id: uuid.UUID) -> dict[str, Any]:
     """Fetch a document from storage, parse it, persist chunks, and update status."""
     async with get_session_factory()() as session:
         async with session.begin():
@@ -62,7 +62,7 @@ async def run_parse_document(document_id: uuid.UUID, workspace_id: uuid.UUID) ->
     return {"document_id": str(document_id), "chunk_count": len(chunks)}
 
 
-async def run_embed_document(document_id: uuid.UUID, workspace_id: uuid.UUID) -> Dict[str, Any]:
+async def run_embed_document(document_id: uuid.UUID, workspace_id: uuid.UUID) -> dict[str, Any]:
     """Compute embeddings for all chunks and upsert into the vector store."""
     async with get_session_factory()() as session:
         async with session.begin():
@@ -109,7 +109,7 @@ async def run_embed_document(document_id: uuid.UUID, workspace_id: uuid.UUID) ->
     return {"document_id": str(document_id), "vector_count": len(records)}
 
 
-async def run_build_index(index_id: uuid.UUID, workspace_id: uuid.UUID) -> Dict[str, Any]:
+async def run_build_index(index_id: uuid.UUID, workspace_id: uuid.UUID) -> dict[str, Any]:
     """Update VectorIndex status to ready after a build."""
     async with get_session_factory()() as session:
         async with session.begin():
@@ -123,7 +123,7 @@ async def run_build_index(index_id: uuid.UUID, workspace_id: uuid.UUID) -> Dict[
     return {"index_id": str(index_id), "status": "ready"}
 
 
-async def run_eval(run_id: uuid.UUID) -> Dict[str, Any]:
+async def run_eval(run_id: uuid.UUID) -> dict[str, Any]:
     """Aggregate eval metrics, write JSON/HTML report artifacts, finalize run status."""
     import json
     from datetime import datetime, timezone
@@ -147,7 +147,7 @@ async def run_eval(run_id: uuid.UUID) -> Dict[str, Any]:
 
     exp_id_str = str(probe.experiment_id)
     eval_kind = str((probe.run_logs or {}).get("kind", ""))
-    metrics_for_ml: Dict[str, Any] = {}
+    metrics_for_ml: dict[str, Any] = {}
 
     try:
         async with factory() as session:
@@ -165,7 +165,7 @@ async def run_eval(run_id: uuid.UUID) -> Dict[str, Any]:
                 await session.flush()
 
                 snap = await eval_svc.compute_and_save_aggregate(run_id)
-                report: Dict[str, Any] = {
+                report: dict[str, Any] = {
                     "run_id": str(run_id),
                     "experiment_id": str(run.experiment_id),
                     "metrics": snap.snapshot_metrics or {},
@@ -173,11 +173,11 @@ async def run_eval(run_id: uuid.UUID) -> Dict[str, Any]:
                 }
                 json_body = json.dumps(report, indent=2).encode("utf-8")
                 html_body = (
-                    "<!DOCTYPE html><html><head><meta charset=\"utf-8\"/>"
+                    '<!DOCTYPE html><html><head><meta charset="utf-8"/>'
                     "<title>Evaluation report</title></head><body><pre>"
                     f"{json.dumps(report, indent=2)}"
                     "</pre></body></html>"
-                ).encode("utf-8")
+                ).encode()
 
                 json_uri = await storage.put(json_key, json_body, "application/json")
                 await storage.put(html_key, html_body, "text/html; charset=utf-8")

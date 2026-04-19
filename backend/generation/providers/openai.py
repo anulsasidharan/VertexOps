@@ -1,9 +1,8 @@
 """OpenAI chat completion adapter."""
 
 import logging
-from typing import Optional
 
-from backend.generation.base import GenerationRequest, GenerationResponse
+from backend.generation.base import GenerationResponse
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +26,7 @@ class OpenAIChatProvider:
     def _get_client(self):
         if self._client is None:
             from openai import AsyncOpenAI
+
             self._client = AsyncOpenAI(
                 api_key=self._api_key,
                 max_retries=self._max_retries,

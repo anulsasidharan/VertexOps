@@ -20,7 +20,9 @@ def build_index(self, index_id: str, workspace_id: str) -> dict:
     logger.info("build_index: index=%s ws=%s", index_id, workspace_id)
     try:
         import asyncio
+
         from backend.workers._runner import run_build_index
+
         result = asyncio.run(run_build_index(UUID(index_id), UUID(workspace_id)))
         return result
     except Exception as exc:

@@ -1,6 +1,5 @@
 """Repository for MetricSnapshot aggregate."""
 
-from typing import List
 from uuid import UUID
 
 from sqlalchemy import asc, select
@@ -16,7 +15,7 @@ class MetricSnapshotRepository(BaseRepository[MetricSnapshot]):
     def __init__(self, session: AsyncSession) -> None:
         super().__init__(session)
 
-    async def list_by_run(self, run_id: UUID) -> List[MetricSnapshot]:
+    async def list_by_run(self, run_id: UUID) -> list[MetricSnapshot]:
         result = await self.session.execute(
             select(MetricSnapshot)
             .where(MetricSnapshot.run_id == run_id)

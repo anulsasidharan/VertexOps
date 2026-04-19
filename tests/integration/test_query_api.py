@@ -3,7 +3,6 @@
 import uuid
 from unittest.mock import AsyncMock, MagicMock
 
-import pytest
 from fastapi.testclient import TestClient
 
 from backend.api.dependencies.auth import AuthContext, get_current_user
@@ -68,11 +67,14 @@ def test_query_happy_path():
     app.dependency_overrides[get_embedding_service] = lambda: _mock_embed()
 
     with TestClient(app) as client:
-        resp = client.post("/api/v1/query", json={
-            "question": "What is the answer?",
-            "index_id": str(_IDX_ID),
-            "top_k": 3,
-        })
+        resp = client.post(
+            "/api/v1/query",
+            json={
+                "question": "What is the answer?",
+                "index_id": str(_IDX_ID),
+                "top_k": 3,
+            },
+        )
 
     app.dependency_overrides.clear()
     assert resp.status_code == 200
@@ -96,10 +98,13 @@ def test_query_empty_retrieval_returns_empty_sources():
     app.dependency_overrides[get_embedding_service] = lambda: _mock_embed()
 
     with TestClient(app) as client:
-        resp = client.post("/api/v1/query", json={
-            "question": "Unknown question",
-            "index_id": str(_IDX_ID),
-        })
+        resp = client.post(
+            "/api/v1/query",
+            json={
+                "question": "Unknown question",
+                "index_id": str(_IDX_ID),
+            },
+        )
 
     app.dependency_overrides.clear()
     assert resp.status_code == 200
@@ -123,10 +128,13 @@ def test_query_invalid_request_empty_question():
     app.dependency_overrides[get_retrieval_service] = lambda: MagicMock()
     app.dependency_overrides[get_generation_service] = lambda: MagicMock()
     with TestClient(app) as client:
-        resp = client.post("/api/v1/query", json={
-            "question": "",
-            "index_id": str(_IDX_ID),
-        })
+        resp = client.post(
+            "/api/v1/query",
+            json={
+                "question": "",
+                "index_id": str(_IDX_ID),
+            },
+        )
     app.dependency_overrides.clear()
     assert resp.status_code == 422
 
@@ -136,22 +144,31 @@ def test_query_requires_auth():
     app.dependency_overrides[get_retrieval_service] = lambda: MagicMock()
     app.dependency_overrides[get_generation_service] = lambda: MagicMock()
     with TestClient(app) as client:
-        resp = client.post("/api/v1/query", json={
-            "question": "test",
-            "index_id": str(_IDX_ID),
-        })
+        resp = client.post(
+            "/api/v1/query",
+            json={
+                "question": "test",
+                "index_id": str(_IDX_ID),
+            },
+        )
     app.dependency_overrides.clear()
     assert resp.status_code == 401
 
 
 def test_query_sources_include_section_path():
     mock_retrieval = MagicMock()
-    mock_retrieval.retrieve = AsyncMock(return_value=[
-        RetrievalResult(
-            chunk_id="c2", document_id="d1", workspace_id="w1",
-            text="text", score=0.8, section_path="section/sub",
-        )
-    ])
+    mock_retrieval.retrieve = AsyncMock(
+        return_value=[
+            RetrievalResult(
+                chunk_id="c2",
+                document_id="d1",
+                workspace_id="w1",
+                text="text",
+                score=0.8,
+                section_path="section/sub",
+            )
+        ]
+    )
     mock_generation = MagicMock()
     mock_generation.generate = AsyncMock(return_value=_gen_response())
 
@@ -161,9 +178,13 @@ def test_query_sources_include_section_path():
     app.dependency_overrides[get_embedding_service] = lambda: _mock_embed()
 
     with TestClient(app) as client:
-        resp = client.post("/api/v1/query", json={
-            "question": "Q?", "index_id": str(_IDX_ID),
-        })
+        resp = client.post(
+            "/api/v1/query",
+            json={
+                "question": "Q?",
+                "index_id": str(_IDX_ID),
+            },
+        )
 
     app.dependency_overrides.clear()
     assert resp.status_code == 200
@@ -187,10 +208,13 @@ def test_rag_query_happy_path():
     app.dependency_overrides[get_embedding_service] = lambda: _mock_embed()
 
     with TestClient(app) as client:
-        resp = client.post("/api/v1/rag/query", json={
-            "query": "Tell me about RAG",
-            "index_id": str(_IDX_ID),
-        })
+        resp = client.post(
+            "/api/v1/rag/query",
+            json={
+                "query": "Tell me about RAG",
+                "index_id": str(_IDX_ID),
+            },
+        )
 
     app.dependency_overrides.clear()
     assert resp.status_code == 200
@@ -212,10 +236,13 @@ def test_rag_query_empty_results_zero_confidence():
     app.dependency_overrides[get_embedding_service] = lambda: _mock_embed()
 
     with TestClient(app) as client:
-        resp = client.post("/api/v1/rag/query", json={
-            "query": "Unknown",
-            "index_id": str(_IDX_ID),
-        })
+        resp = client.post(
+            "/api/v1/rag/query",
+            json={
+                "query": "Unknown",
+                "index_id": str(_IDX_ID),
+            },
+        )
 
     app.dependency_overrides.clear()
     assert resp.status_code == 200
@@ -227,9 +254,13 @@ def test_rag_query_requires_auth():
     app.dependency_overrides[get_retrieval_service] = lambda: MagicMock()
     app.dependency_overrides[get_generation_service] = lambda: MagicMock()
     with TestClient(app) as client:
-        resp = client.post("/api/v1/rag/query", json={
-            "query": "test", "index_id": str(_IDX_ID),
-        })
+        resp = client.post(
+            "/api/v1/rag/query",
+            json={
+                "query": "test",
+                "index_id": str(_IDX_ID),
+            },
+        )
     app.dependency_overrides.clear()
     assert resp.status_code == 401
 

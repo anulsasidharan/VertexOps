@@ -1,12 +1,11 @@
 """Maximum Marginal Relevance (MMR) re-ranker for result diversification."""
 
 import math
-from typing import List
 
 from backend.retrieval.base import RetrievalResult
 
 
-def _cosine(a: List[float], b: List[float]) -> float:
+def _cosine(a: list[float], b: list[float]) -> float:
     dot = sum(x * y for x, y in zip(a, b))
     na = math.sqrt(sum(x * x for x in a))
     nb = math.sqrt(sum(x * x for x in b))
@@ -16,11 +15,11 @@ def _cosine(a: List[float], b: List[float]) -> float:
 
 
 def mmr_rerank(
-    results: List[RetrievalResult],
-    embeddings: List[List[float]],
+    results: list[RetrievalResult],
+    embeddings: list[list[float]],
     lambda_: float = 0.5,
     top_k: int | None = None,
-) -> List[RetrievalResult]:
+) -> list[RetrievalResult]:
     """Re-rank *results* using MMR to balance relevance and diversity.
 
     Args:
@@ -41,7 +40,7 @@ def mmr_rerank(
     k = min(k, len(results))
 
     remaining = list(range(len(results)))
-    selected: List[int] = []
+    selected: list[int] = []
 
     # Relevance scores normalised to [0, 1] for the MMR formula
     max_score = max(r.score for r in results) or 1.0
@@ -52,9 +51,7 @@ def mmr_rerank(
         best_val = float("-inf")
         for i in remaining:
             redundancy = (
-                max(_cosine(embeddings[i], embeddings[s]) for s in selected)
-                if selected
-                else 0.0
+                max(_cosine(embeddings[i], embeddings[s]) for s in selected) if selected else 0.0
             )
             val = lambda_ * rel[i] - (1 - lambda_) * redundancy
             if val > best_val:

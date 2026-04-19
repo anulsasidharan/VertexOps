@@ -5,7 +5,6 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -116,8 +115,8 @@ async def test_run_parse_document_not_found_raises():
 
 @pytest.mark.asyncio
 async def test_run_embed_document_happy_path():
-    from backend.workers._runner import run_embed_document
     from backend.embedding.base import EmbeddingResult
+    from backend.workers._runner import run_embed_document
 
     doc_id = uuid.uuid4()
     ws_id = uuid.uuid4()
@@ -140,9 +139,7 @@ async def test_run_embed_document_happy_path():
 
     mock_embed_svc = MagicMock()
     mock_embed_svc.embed_texts = AsyncMock(
-        return_value=EmbeddingResult(
-            embeddings=[[0.1, 0.2, 0.3]], model="test", dimensions=3
-        )
+        return_value=EmbeddingResult(embeddings=[[0.1, 0.2, 0.3]], model="test", dimensions=3)
     )
 
     mock_vector_store = MagicMock()
@@ -244,16 +241,19 @@ async def test_run_build_index_not_found_raises():
 def test_pipeline_task_registered():
     from backend.workers.celery_app import celery_app
     from backend.workers.tasks import pipeline  # noqa: F401
+
     assert "backend.workers.tasks.pipeline.ingest_document" in celery_app.tasks
 
 
 def test_pipeline_task_queue():
     from backend.workers.tasks.pipeline import ingest_document
+
     assert ingest_document.queue == "ingest"
 
 
 def test_pipeline_task_max_retries():
     from backend.workers.tasks.pipeline import ingest_document
+
     assert ingest_document.max_retries == 3
 
 

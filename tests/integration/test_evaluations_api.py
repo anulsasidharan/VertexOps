@@ -4,7 +4,6 @@ import uuid
 from datetime import datetime
 from unittest.mock import AsyncMock, MagicMock
 
-import pytest
 from fastapi.testclient import TestClient
 
 from backend.api.dependencies.auth import AuthContext, get_current_user
@@ -26,9 +25,7 @@ def _auth(workspace_id=_WS_ID):
 
 
 def _no_ws_auth():
-    return AuthContext(
-        user_id=uuid.uuid4(), role="member", workspace_id=None, auth_type="jwt"
-    )
+    return AuthContext(user_id=uuid.uuid4(), role="member", workspace_id=None, auth_type="jwt")
 
 
 def _make_run(**kwargs):
@@ -54,9 +51,7 @@ def test_create_evaluation_happy_path(monkeypatch):
     def fake_enqueue(rid: uuid.UUID) -> None:
         captured.append(rid)
 
-    monkeypatch.setattr(
-        "backend.api.v1.evaluations._enqueue_evaluation_worker", fake_enqueue
-    )
+    monkeypatch.setattr("backend.api.v1.evaluations._enqueue_evaluation_worker", fake_enqueue)
 
     mock_lifecycle = MagicMock()
     mock_lifecycle.start_evaluation = AsyncMock(return_value=_make_run())
@@ -208,8 +203,9 @@ def test_get_evaluation_report_json(monkeypatch):
 
 
 def test_get_evaluation_report_not_ready():
-    from backend.api.v1 import evaluations as eval_module
     from unittest.mock import patch
+
+    from backend.api.v1 import evaluations as eval_module
 
     mock_lifecycle = MagicMock()
     run = _make_run(run_logs={})

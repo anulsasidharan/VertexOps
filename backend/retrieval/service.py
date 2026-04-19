@@ -1,7 +1,6 @@
 """Retrieval service — vector search, score filtering, and source normalization."""
 
 import logging
-from typing import List
 
 from backend.retrieval.base import RetrievalConfig, RetrievalResult
 from backend.vector_store.base import BaseVectorStore
@@ -18,9 +17,9 @@ class RetrievalService:
 
     async def retrieve(
         self,
-        query_vector: List[float],
+        query_vector: list[float],
         config: RetrievalConfig,
-    ) -> List[RetrievalResult]:
+    ) -> list[RetrievalResult]:
         """Search the vector store and return normalized results above min_score.
 
         Returns an empty list when no results meet the threshold or when the
@@ -38,7 +37,7 @@ class RetrievalService:
             logger.error("Vector store search failed: %s", exc)
             return []
 
-        results: List[RetrievalResult] = []
+        results: list[RetrievalResult] = []
         for hit in raw:
             if hit.score < config.min_score:
                 continue

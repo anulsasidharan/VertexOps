@@ -1,6 +1,6 @@
 """Repository for APIKey aggregate."""
 
-from typing import List, Optional
+from typing import Optional
 from uuid import UUID
 
 from sqlalchemy import select
@@ -17,13 +17,9 @@ class APIKeyRepository(BaseRepository[APIKey]):
         super().__init__(session)
 
     async def get_by_hash(self, key_hash: str) -> Optional[APIKey]:
-        result = await self.session.execute(
-            select(APIKey).where(APIKey.key_hash == key_hash)
-        )
+        result = await self.session.execute(select(APIKey).where(APIKey.key_hash == key_hash))
         return result.scalars().first()
 
-    async def list_by_user(self, user_id: UUID) -> List[APIKey]:
-        result = await self.session.execute(
-            select(APIKey).where(APIKey.user_id == user_id)
-        )
+    async def list_by_user(self, user_id: UUID) -> list[APIKey]:
+        result = await self.session.execute(select(APIKey).where(APIKey.user_id == user_id))
         return list(result.scalars().all())

@@ -4,7 +4,7 @@ import hashlib
 import json
 import logging
 import uuid
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -17,7 +17,7 @@ from backend.repositories.run_repository import RunRepository
 logger = logging.getLogger(__name__)
 
 
-def _compute_config_hash(config: Dict[str, Any]) -> str:
+def _compute_config_hash(config: dict[str, Any]) -> str:
     """SHA-256 of canonically-sorted JSON for reproducible config identity."""
     serialised = json.dumps(config, sort_keys=True, separators=(",", ":"))
     return hashlib.sha256(serialised.encode()).hexdigest()
@@ -33,7 +33,7 @@ class ExperimentService:
         self,
         workspace_id: uuid.UUID,
         name: str,
-        config: Optional[Dict[str, Any]] = None,
+        config: Optional[dict[str, Any]] = None,
         description: Optional[str] = None,
         index_id: Optional[uuid.UUID] = None,
     ) -> Experiment:
@@ -50,9 +50,7 @@ class ExperimentService:
         logger.info("Created experiment id=%s name=%r", exp.id, name)
         return exp
 
-    async def get(
-        self, experiment_id: uuid.UUID, workspace_id: uuid.UUID
-    ) -> Experiment:
+    async def get(self, experiment_id: uuid.UUID, workspace_id: uuid.UUID) -> Experiment:
         exp = await self._exp_repo.get(experiment_id)
         if exp is None:
             raise NotFoundError(f"Experiment {experiment_id} not found.")
@@ -60,12 +58,10 @@ class ExperimentService:
             raise ForbiddenError("Experiment does not belong to this workspace.")
         return exp
 
-    async def list(self, workspace_id: uuid.UUID) -> List[Experiment]:
+    async def list(self, workspace_id: uuid.UUID) -> list[Experiment]:
         return await self._exp_repo.list_by_workspace(workspace_id)
 
-    async def delete(
-        self, experiment_id: uuid.UUID, workspace_id: uuid.UUID
-    ) -> None:
+    async def delete(self, experiment_id: uuid.UUID, workspace_id: uuid.UUID) -> None:
         exp = await self.get(experiment_id, workspace_id)
         await self._exp_repo.delete(exp)
 
@@ -73,7 +69,7 @@ class ExperimentService:
         self,
         experiment_id: uuid.UUID,
         workspace_id: uuid.UUID,
-        run_config: Optional[Dict[str, Any]] = None,
+        run_config: Optional[dict[str, Any]] = None,
     ) -> Run:
         """Create a queued Run for the experiment and return it."""
         exp = await self.get(experiment_id, workspace_id)

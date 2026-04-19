@@ -24,5 +24,4 @@ class BaseLoader(ABC):
     """Parse raw bytes into a ParsedDocument."""
 
     @abstractmethod
-    def load(self, content: bytes, filename: str) -> ParsedDocument:
-        ...
+    def load(self, content: bytes, filename: str) -> ParsedDocument: ...

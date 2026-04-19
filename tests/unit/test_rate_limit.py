@@ -4,22 +4,21 @@ import time
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from fastapi import FastAPI, Depends
+from fastapi import Depends, FastAPI
 from fastapi.testclient import TestClient
 
+from backend.api.dependencies.rate_limit import rate_limit
 from backend.core.exceptions import RateLimitError
 from backend.core.rate_limit import (
     DEFAULT_POLICY,
     INGEST_POLICY,
     QUERY_POLICY,
     STRICT_POLICY,
-    RateLimitPolicy,
     RateLimiter,
+    RateLimitPolicy,
     check_redis_connectivity,
     get_rate_limiter,
 )
-from backend.api.dependencies.rate_limit import rate_limit
-
 
 # ---------------------------------------------------------------------------
 # RateLimitPolicy
@@ -179,9 +178,7 @@ async def test_check_connectivity_down():
 
 @pytest.mark.asyncio
 async def test_check_redis_connectivity_delegates_to_limiter():
-    with patch(
-        "backend.core.rate_limit.get_rate_limiter"
-    ) as mock_get:
+    with patch("backend.core.rate_limit.get_rate_limiter") as mock_get:
         mock_limiter = AsyncMock()
         mock_limiter.check_connectivity = AsyncMock(return_value=True)
         mock_get.return_value = mock_limiter
@@ -239,12 +236,15 @@ def _mock_limiter(allowed: bool, remaining: int = 5, reset_at: int = 9999999999)
 
 def test_rate_limit_dependency_allows_request():
     app = _build_test_app(DEFAULT_POLICY)
-    with patch(
-        "backend.api.dependencies.rate_limit.get_rate_limiter",
-        return_value=_mock_limiter(allowed=True, remaining=99),
-    ), patch(
-        "backend.api.dependencies.rate_limit.get_settings",
-        return_value=MagicMock(rate_limit_enabled=True),
+    with (
+        patch(
+            "backend.api.dependencies.rate_limit.get_rate_limiter",
+            return_value=_mock_limiter(allowed=True, remaining=99),
+        ),
+        patch(
+            "backend.api.dependencies.rate_limit.get_settings",
+            return_value=MagicMock(rate_limit_enabled=True),
+        ),
     ):
         client = TestClient(app)
         response = client.get("/limited")
@@ -256,12 +256,15 @@ def test_rate_limit_dependency_allows_request():
 
 def test_rate_limit_dependency_blocks_request():
     app = _build_test_app(DEFAULT_POLICY)
-    with patch(
-        "backend.api.dependencies.rate_limit.get_rate_limiter",
-        return_value=_mock_limiter(allowed=False, remaining=0),
-    ), patch(
-        "backend.api.dependencies.rate_limit.get_settings",
-        return_value=MagicMock(rate_limit_enabled=True),
+    with (
+        patch(
+            "backend.api.dependencies.rate_limit.get_rate_limiter",
+            return_value=_mock_limiter(allowed=False, remaining=0),
+        ),
+        patch(
+            "backend.api.dependencies.rate_limit.get_settings",
+            return_value=MagicMock(rate_limit_enabled=True),
+        ),
     ):
         client = TestClient(app, raise_server_exceptions=False)
         response = client.get("/limited")
@@ -286,12 +289,15 @@ def test_rate_limit_dependency_disabled_allows_all():
 def test_rate_limit_blocked_response_has_correct_envelope():
     """A 429 response must carry the RATE_LIMIT_EXCEEDED error envelope."""
     app = _build_test_app(DEFAULT_POLICY)
-    with patch(
-        "backend.api.dependencies.rate_limit.get_rate_limiter",
-        return_value=_mock_limiter(allowed=False, remaining=0),
-    ), patch(
-        "backend.api.dependencies.rate_limit.get_settings",
-        return_value=MagicMock(rate_limit_enabled=True),
+    with (
+        patch(
+            "backend.api.dependencies.rate_limit.get_rate_limiter",
+            return_value=_mock_limiter(allowed=False, remaining=0),
+        ),
+        patch(
+            "backend.api.dependencies.rate_limit.get_settings",
+            return_value=MagicMock(rate_limit_enabled=True),
+        ),
     ):
         client = TestClient(app, raise_server_exceptions=False)
         response = client.get("/limited")
@@ -307,12 +313,15 @@ def test_rate_limit_uses_client_ip_as_identifier():
     mock_limiter = _mock_limiter(allowed=True, remaining=4)
     app = _build_test_app(policy, key_prefix="myprefix")
 
-    with patch(
-        "backend.api.dependencies.rate_limit.get_rate_limiter",
-        return_value=mock_limiter,
-    ), patch(
-        "backend.api.dependencies.rate_limit.get_settings",
-        return_value=MagicMock(rate_limit_enabled=True),
+    with (
+        patch(
+            "backend.api.dependencies.rate_limit.get_rate_limiter",
+            return_value=mock_limiter,
+        ),
+        patch(
+            "backend.api.dependencies.rate_limit.get_settings",
+            return_value=MagicMock(rate_limit_enabled=True),
+        ),
     ):
         client = TestClient(app)
         client.get("/limited")
@@ -328,7 +337,6 @@ def test_rate_limit_uses_client_ip_as_identifier():
 
 
 def test_rate_limit_error_envelope_shape():
-    from backend.core.exceptions import RateLimitError
 
     err = RateLimitError("too many")
     envelope = err.to_envelope().model_dump()

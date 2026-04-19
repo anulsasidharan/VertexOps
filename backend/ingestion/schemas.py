@@ -1,7 +1,7 @@
 """Pydantic schemas for the Documents API."""
 
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 from uuid import UUID
 
 from pydantic import BaseModel, Field
@@ -12,7 +12,7 @@ class DocumentRegisterRequest(BaseModel):
     source_uri: Optional[str] = None
     format: Optional[str] = None
     language: Optional[str] = None
-    doc_metadata: Optional[Dict[str, Any]] = None
+    doc_metadata: Optional[dict[str, Any]] = None
 
 
 class PrepareUploadRequest(BaseModel):
@@ -37,7 +37,7 @@ class DocumentResponse(BaseModel):
     language: Optional[str]
     content_hash: Optional[str]
     ingest_status: str
-    doc_metadata: Optional[Dict[str, Any]]
+    doc_metadata: Optional[dict[str, Any]]
     created_at: datetime
     updated_at: datetime
 
@@ -45,7 +45,7 @@ class DocumentResponse(BaseModel):
 
 
 class DocumentListResponse(BaseModel):
-    items: List[DocumentResponse]
+    items: list[DocumentResponse]
     total: int
     limit: int
     offset: int
@@ -57,5 +57,5 @@ class PrepareUploadResponse(BaseModel):
     storage_key: str
     storage_uri: str
     method: str
-    headers: Dict[str, str]
+    headers: dict[str, str]
     expires_in: int

@@ -31,9 +31,15 @@ async def _run(*, email: str, password: str, workspace_name: str) -> int:
 
     if not await check_db_connectivity():
         print("Cannot connect to PostgreSQL (DATABASE_URL).", file=sys.stderr)
-        print("  1) Start the database, e.g. from the repo root: docker compose up -d postgres", file=sys.stderr)
+        print(
+            "  1) Start the database, e.g. from the repo root: docker compose up -d postgres",
+            file=sys.stderr,
+        )
         print("  2) Match .env to your server: compose Postgres uses", file=sys.stderr)
-        print("     postgresql+asyncpg://vertexops:vertexops@localhost:5432/vertexops (host).", file=sys.stderr)
+        print(
+            "     postgresql+asyncpg://vertexops:vertexops@localhost:5432/vertexops (host).",
+            file=sys.stderr,
+        )
         print("  3) Then: alembic upgrade head", file=sys.stderr)
         return 1
 
@@ -88,8 +94,7 @@ def main() -> None:
 
     if args.password == "changeme":
         print(
-            "Warning: using default password 'changeme'. "
-            "Pass --password for something stronger.",
+            "Warning: using default password 'changeme'. Pass --password for something stronger.",
             file=sys.stderr,
         )
 

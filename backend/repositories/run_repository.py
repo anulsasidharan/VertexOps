@@ -1,6 +1,5 @@
 """Repository for Run aggregate."""
 
-from typing import List
 from uuid import UUID
 
 from sqlalchemy import select
@@ -16,14 +15,10 @@ class RunRepository(BaseRepository[Run]):
     def __init__(self, session: AsyncSession) -> None:
         super().__init__(session)
 
-    async def list_by_experiment(self, experiment_id: UUID) -> List[Run]:
-        result = await self.session.execute(
-            select(Run).where(Run.experiment_id == experiment_id)
-        )
+    async def list_by_experiment(self, experiment_id: UUID) -> list[Run]:
+        result = await self.session.execute(select(Run).where(Run.experiment_id == experiment_id))
         return list(result.scalars().all())
 
-    async def list_by_status(self, status: str) -> List[Run]:
-        result = await self.session.execute(
-            select(Run).where(Run.status == status)
-        )
+    async def list_by_status(self, status: str) -> list[Run]:
+        result = await self.session.execute(select(Run).where(Run.status == status))
         return list(result.scalars().all())

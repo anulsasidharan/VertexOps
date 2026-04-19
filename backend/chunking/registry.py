@@ -1,7 +1,7 @@
 """Chunking strategy registry — maps config to chunker instance."""
 
-from dataclasses import dataclass, field
-from typing import List, Literal, Optional
+from dataclasses import dataclass
+from typing import Literal, Optional
 
 from backend.chunking.base import BaseChunker
 from backend.chunking.strategies.code import CodeChunker
@@ -17,7 +17,7 @@ class ChunkingConfig:
     strategy: Strategy = "fixed"
     chunk_size: int = 512
     chunk_overlap: int = 64
-    separators: Optional[List[str]] = None
+    separators: Optional[list[str]] = None
 
 
 def get_chunker(config: ChunkingConfig) -> BaseChunker:

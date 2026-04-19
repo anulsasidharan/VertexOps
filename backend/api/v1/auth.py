@@ -1,7 +1,7 @@
 """Auth endpoints — JWT token issuance and API key management."""
 
-from typing import Annotated, List, Optional
 import uuid
+from typing import Annotated, Optional
 
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, EmailStr
@@ -113,13 +113,13 @@ async def create_api_key(
 
 @router.get(
     "/api-keys",
-    response_model=List[APIKeyListItem],
+    response_model=list[APIKeyListItem],
     summary="List API keys for current user",
 )
 async def list_api_keys(
     auth: Annotated[AuthContext, Depends(get_current_user)],
     db: AsyncSession = Depends(get_db),
-) -> List[APIKeyListItem]:
+) -> list[APIKeyListItem]:
     repo = APIKeyRepository(db)
     keys = await repo.list_by_user(auth.user_id)
     return [APIKeyListItem(id=k.id, label=k.label) for k in keys]

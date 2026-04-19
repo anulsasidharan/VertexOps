@@ -1,7 +1,6 @@
 """OpenAI embedding adapter."""
 
-import asyncio
-from typing import List, Optional
+from typing import Optional
 
 from backend.embedding.base import BaseEmbeddingProvider, EmbeddingResult
 
@@ -50,17 +49,15 @@ class OpenAIEmbeddingProvider(BaseEmbeddingProvider):
                 raise ImportError(
                     "openai package is required for OpenAIEmbeddingProvider: pip install openai"
                 ) from exc
-            self._client = AsyncOpenAI(
-                api_key=self._api_key, max_retries=self._max_retries
-            )
+            self._client = AsyncOpenAI(api_key=self._api_key, max_retries=self._max_retries)
         return self._client
 
-    async def embed(self, texts: List[str]) -> EmbeddingResult:
+    async def embed(self, texts: list[str]) -> EmbeddingResult:
         if not texts:
             return EmbeddingResult(embeddings=[], model=self._model, dimensions=self.dimensions)
 
         client = self._get_client()
-        all_embeddings: List[List[float]] = []
+        all_embeddings: list[list[float]] = []
         total_tokens = 0
 
         for i in range(0, len(texts), self._batch_size):

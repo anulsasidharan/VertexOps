@@ -5,7 +5,7 @@ import hmac
 import secrets
 import uuid
 from datetime import datetime, timedelta, timezone
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 import bcrypt
 import jwt
@@ -17,6 +17,7 @@ def _password_bytes(password: str) -> bytes:
     """Bcrypt ignores input past 72 bytes; truncate so hashing never raises on long secrets."""
     raw = password.encode("utf-8")
     return raw[:72] if len(raw) > 72 else raw
+
 
 _API_KEY_PREFIX = "vops_"
 _API_KEY_BYTES = 32
@@ -53,10 +54,10 @@ def create_access_token(
     secret_key: str,
     algorithm: str = "HS256",
     expires_minutes: int = 60,
-    extra: Optional[Dict[str, Any]] = None,
+    extra: Optional[dict[str, Any]] = None,
 ) -> str:
     now = datetime.now(tz=timezone.utc)
-    payload: Dict[str, Any] = {
+    payload: dict[str, Any] = {
         "sub": subject,
         "role": role,
         "iat": now,
@@ -73,7 +74,7 @@ def decode_access_token(
     token: str,
     secret_key: str,
     algorithm: str = "HS256",
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Decode and validate a JWT; raises UnauthorizedError on any failure."""
     try:
         return jwt.decode(token, secret_key, algorithms=[algorithm])

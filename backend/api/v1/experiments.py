@@ -2,7 +2,7 @@
 
 import uuid
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
@@ -19,11 +19,12 @@ router = APIRouter()
 # Schemas
 # ---------------------------------------------------------------------------
 
+
 class ExperimentCreateRequest(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
     description: Optional[str] = None
     index_id: Optional[uuid.UUID] = None
-    config: Dict[str, Any] = Field(default_factory=dict)
+    config: dict[str, Any] = Field(default_factory=dict)
 
 
 class RunResponse(BaseModel):
@@ -42,7 +43,7 @@ class ExperimentResponse(BaseModel):
     name: str
     description: Optional[str] = None
     index_id: Optional[uuid.UUID] = None
-    config: Dict[str, Any] = Field(default_factory=dict)
+    config: dict[str, Any] = Field(default_factory=dict)
     config_hash: Optional[str] = None
     created_at: datetime
     updated_at: datetime
@@ -65,17 +66,18 @@ class ExperimentResponse(BaseModel):
 
 
 class ExperimentListResponse(BaseModel):
-    items: List[ExperimentResponse]
+    items: list[ExperimentResponse]
     total: int
 
 
 class RunKickoffRequest(BaseModel):
-    run_config: Dict[str, Any] = Field(default_factory=dict)
+    run_config: dict[str, Any] = Field(default_factory=dict)
 
 
 # ---------------------------------------------------------------------------
 # Dependency
 # ---------------------------------------------------------------------------
+
 
 def get_experiment_service(db=Depends(get_db)) -> ExperimentService:
     return ExperimentService(db)
@@ -84,6 +86,7 @@ def get_experiment_service(db=Depends(get_db)) -> ExperimentService:
 # ---------------------------------------------------------------------------
 # Endpoints
 # ---------------------------------------------------------------------------
+
 
 @router.post("", response_model=ExperimentResponse, status_code=201)
 async def create_experiment(

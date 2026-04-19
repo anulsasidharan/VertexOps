@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 from enum import Enum
-from typing import Any, Dict, Optional
+from typing import Any
 from uuid import UUID
 
 logger = logging.getLogger("vertexops.audit")
@@ -34,10 +34,10 @@ class AuditEvent(str, Enum):
 
 def emit(
     event: AuditEvent,
-    actor_id: Optional[UUID] = None,
-    workspace_id: Optional[UUID] = None,
-    resource_id: Optional[str] = None,
-    details: Optional[Dict[str, Any]] = None,
+    actor_id: UUID | None = None,
+    workspace_id: UUID | None = None,
+    resource_id: str | None = None,
+    details: dict[str, Any] | None = None,
     outcome: str = "success",
 ) -> None:
     """Emit a structured audit log entry.
@@ -46,7 +46,7 @@ def emit(
     a SIEM, or any structured log pipeline without additional transformation.
     Never include raw secrets, PII beyond identifiers, or full request bodies.
     """
-    record: Dict[str, Any] = {
+    record: dict[str, Any] = {
         "audit": True,
         "event": event.value,
         "outcome": outcome,
@@ -62,10 +62,7 @@ def emit(
         safe = {
             k: v
             for k, v in details.items()
-            if not any(
-                tok in k.lower()
-                for tok in ("secret", "password", "token", "key", "pepper")
-            )
+            if not any(tok in k.lower() for tok in ("secret", "password", "token", "key", "pepper"))
         }
         record["details"] = safe
 
