@@ -1,0 +1,57 @@
+{
+  "family": "vertexops-worker",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "2048",
+  "memory": "4096",
+  "executionRoleArn": "${ECS_EXECUTION_ROLE_ARN}",
+  "taskRoleArn": "${ECS_TASK_ROLE_ARN}",
+  "containerDefinitions": [
+    {
+      "name": "worker",
+      "image": "${ECR_WORKER_IMAGE_URI}:${IMAGE_TAG}",
+      "essential": true,
+      "command": [
+        "celery", "-A", "backend.workers.celery_app", "worker",
+        "--loglevel=info",
+        "--queues=ingest,embed,eval,index",
+        "--concurrency=4",
+        "--max-tasks-per-child=100"
+      ],
+      "environment": [
+        { "name": "APP_ENV",    "value": "production" },
+        { "name": "LOG_LEVEL",  "value": "INFO" }
+      ],
+      "secrets": [
+        {
+          "name": "JWT_SECRET_KEY",
+          "valueFrom": "arn:aws:secretsmanager:${AWS_REGION}:${AWS_ACCOUNT_ID}:secret:vertexops/jwt-secret-key"
+        },
+        {
+          "name": "API_KEY_PEPPER",
+          "valueFrom": "arn:aws:secretsmanager:${AWS_REGION}:${AWS_ACCOUNT_ID}:secret:vertexops/api-key-pepper"
+        },
+        {
+          "name": "DATABASE_URL",
+          "valueFrom": "arn:aws:secretsmanager:${AWS_REGION}:${AWS_ACCOUNT_ID}:secret:vertexops/database-url"
+        },
+        {
+          "name": "REDIS_BROKER_URL",
+          "valueFrom": "arn:aws:secretsmanager:${AWS_REGION}:${AWS_ACCOUNT_ID}:secret:vertexops/redis-broker-url"
+        },
+        {
+          "name": "CELERY_RESULT_BACKEND",
+          "valueFrom": "arn:aws:secretsmanager:${AWS_REGION}:${AWS_ACCOUNT_ID}:secret:vertexops/redis-result-url"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/vertexops-staging/worker",
+          "awslogs-region": "${AWS_REGION}",
+          "awslogs-stream-prefix": "worker"
+        }
+      }
+    }
+  ]
+}
