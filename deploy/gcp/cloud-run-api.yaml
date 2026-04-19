@@ -1,0 +1,78 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: vertexops-api
+  # Replace with your GCP region
+  annotations:
+    run.googleapis.com/ingress: all
+    run.googleapis.com/launch-stage: GA
+spec:
+  template:
+    metadata:
+      annotations:
+        # Scale to zero when idle; set min-instances > 0 for warm start SLA
+        autoscaling.knative.dev/minScale: "1"
+        autoscaling.knative.dev/maxScale: "10"
+        # Mount secrets via Secret Manager instead of env vars in production
+        run.googleapis.com/secrets: >
+          jwt-secret:projects/${GCP_PROJECT_ID}/secrets/vertexops-jwt-secret/versions/latest,
+          api-key-pepper:projects/${GCP_PROJECT_ID}/secrets/vertexops-api-key-pepper/versions/latest
+    spec:
+      serviceAccountName: vertexops-api@${GCP_PROJECT_ID}.iam.gserviceaccount.com
+      containerConcurrency: 80
+      timeoutSeconds: 300
+      containers:
+        - image: ${REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/vertexops/vertexops-api:${IMAGE_TAG}
+          name: api
+          ports:
+            - containerPort: 8000
+              name: http1
+          resources:
+            limits:
+              cpu: "2"
+              memory: 2Gi
+          env:
+            - name: APP_ENV
+              value: production
+            - name: LOG_LEVEL
+              value: INFO
+            - name: DEBUG
+              value: "false"
+            - name: METRICS_ENABLED
+              value: "true"
+            - name: GCP_PROJECT_ID
+              value: ${GCP_PROJECT_ID}
+            - name: VERTEX_AI_LOCATION
+              value: ${VERTEX_AI_LOCATION}
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: vertexops-db-url
+                  key: latest
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: vertexops-redis-url
+                  key: latest
+            - name: JWT_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: vertexops-jwt-secret
+                  key: latest
+            - name: API_KEY_PEPPER
+              valueFrom:
+                secretKeyRef:
+                  name: vertexops-api-key-pepper
+                  key: latest
+          livenessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /api/v1/ready
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 10
