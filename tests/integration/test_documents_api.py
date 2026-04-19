@@ -21,9 +21,7 @@ _NOW = datetime(2026, 4, 17, 12, 0, 0)
 
 
 def _auth(workspace_id=_WS_ID):
-    return AuthContext(
-        user_id=_USER_ID, role="member", workspace_id=workspace_id, auth_type="jwt"
-    )
+    return AuthContext(user_id=_USER_ID, role="member", workspace_id=workspace_id, auth_type="jwt")
 
 
 def _make_doc(**kwargs):
@@ -181,9 +179,7 @@ class TestCompleteUpload:
         assert resp.json()["ingest_status"] == "uploaded"
 
     def test_complete_upload_not_found_returns_404(self):
-        self._svc.complete_upload = AsyncMock(
-            side_effect=NotFoundError("Document not found.")
-        )
+        self._svc.complete_upload = AsyncMock(side_effect=NotFoundError("Document not found."))
         resp = client.post(f"/api/v1/documents/{_DOC_ID}/complete", json={})
         assert resp.status_code == 404
         assert resp.json()["error"]["code"] == "NOT_FOUND"
@@ -230,8 +226,8 @@ class TestListDocuments:
         resp = client.get("/api/v1/documents?limit=10&offset=20")
         assert resp.status_code == 200
         call_args = self._svc.list.call_args[0]
-        assert call_args[2] == 10   # limit
-        assert call_args[3] == 20   # offset
+        assert call_args[2] == 10  # limit
+        assert call_args[3] == 20  # offset
 
     def test_list_status_filter_forwarded(self):
         self._svc.list = AsyncMock(return_value=([], 0))

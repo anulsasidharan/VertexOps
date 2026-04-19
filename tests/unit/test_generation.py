@@ -1,17 +1,17 @@
 """Unit tests for generation service, templates, and OpenAI adapter."""
 
+from unittest.mock import AsyncMock, MagicMock
+
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
 
 from backend.generation.base import GenerationRequest, GenerationResponse
+from backend.generation.service import GenerationService
 from backend.generation.templates import (
     PromptTemplate,
     get_template,
     list_templates,
     register_template,
 )
-from backend.generation.service import GenerationService
-
 
 # ---------------------------------------------------------------------------
 # PromptTemplate
@@ -57,9 +57,9 @@ def test_list_templates_contains_builtins():
 
 
 def test_register_custom_template():
-    register_template(PromptTemplate(
-        name="custom_test", system="sys", user_template="{context} {question}"
-    ))
+    register_template(
+        PromptTemplate(name="custom_test", system="sys", user_template="{context} {question}")
+    )
     assert "custom_test" in list_templates()
 
 
@@ -70,10 +70,15 @@ def test_register_custom_template():
 
 def _make_svc(answer: str = "The answer.") -> tuple:
     provider = MagicMock()
-    provider.complete = AsyncMock(return_value=GenerationResponse(
-        answer=answer, model="gpt-4o-mini", prompt_tokens=10,
-        completion_tokens=5, total_tokens=15,
-    ))
+    provider.complete = AsyncMock(
+        return_value=GenerationResponse(
+            answer=answer,
+            model="gpt-4o-mini",
+            prompt_tokens=10,
+            completion_tokens=5,
+            total_tokens=15,
+        )
+    )
     svc = GenerationService(provider=provider)
     return svc, provider
 
@@ -171,9 +176,7 @@ async def test_openai_provider_calls_api():
     mock_choice = MagicMock()
     mock_choice.message.content = "Hello!"
     mock_choice.finish_reason = "stop"
-    mock_response = MagicMock(
-        choices=[mock_choice], model="gpt-4o-mini", usage=mock_usage
-    )
+    mock_response = MagicMock(choices=[mock_choice], model="gpt-4o-mini", usage=mock_usage)
 
     mock_client = MagicMock()
     mock_client.chat = MagicMock()

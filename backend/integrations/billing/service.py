@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict, Optional
+from typing import Any
 
 from backend.core.config import get_settings
 from backend.integrations.billing import stripe_client
@@ -15,7 +15,7 @@ def record_usage_event(
     event_name: str,
     quantity: float,
     *,
-    metadata: Optional[Dict[str, Any]] = None,
+    metadata: dict[str, Any] | None = None,
 ) -> None:
     """Record a usage unit for optional billing. Does not raise; core flows never depend on it."""
     settings = get_settings()
@@ -24,7 +24,9 @@ def record_usage_event(
 
     key = settings.stripe_api_key
     if key is None:
-        logger.debug("Stripe metering enabled but stripe_api_key is unset; skipping event %s.", event_name)
+        logger.debug(
+            "Stripe metering enabled but stripe_api_key is unset; skipping event %s.", event_name
+        )
         return
 
     stripe_event_name = settings.stripe_meter_event_name or event_name

@@ -1,7 +1,7 @@
 """User ORM model."""
 
 import uuid
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy import ForeignKey, String
 from sqlalchemy.dialects.postgresql import UUID
@@ -30,7 +30,7 @@ class User(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     workspace: Mapped[Optional["Workspace"]] = relationship(
         "Workspace", back_populates="users", lazy="select"
     )
-    api_keys: Mapped[List["APIKey"]] = relationship(
+    api_keys: Mapped[list["APIKey"]] = relationship(
         "APIKey",
         back_populates="user",
         cascade="all, delete-orphan",

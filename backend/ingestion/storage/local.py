@@ -4,8 +4,8 @@ import asyncio
 import os
 from pathlib import Path
 
-from backend.ingestion.storage.base import StorageBackend, UploadSpec
 from backend.core.exceptions import NotFoundError
+from backend.ingestion.storage.base import StorageBackend, UploadSpec
 
 
 class LocalStorageBackend(StorageBackend):

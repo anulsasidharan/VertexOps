@@ -1,15 +1,14 @@
 """Base types and interface for embedding providers."""
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
-from typing import List
+from dataclasses import dataclass
 
 
 @dataclass
 class EmbeddingResult:
     """Vectors returned from an embedding provider for a batch of texts."""
 
-    embeddings: List[List[float]]
+    embeddings: list[list[float]]
     model: str
     dimensions: int
     token_usage: int = 0
@@ -23,7 +22,7 @@ class BaseEmbeddingProvider(ABC):
     """Provider-agnostic interface for computing text embeddings."""
 
     @abstractmethod
-    async def embed(self, texts: List[str]) -> EmbeddingResult:
+    async def embed(self, texts: list[str]) -> EmbeddingResult:
         """Embed a batch of texts and return an EmbeddingResult."""
         ...
 

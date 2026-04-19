@@ -2,16 +2,15 @@
 
 import time
 import uuid
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 
 from backend.api.dependencies.auth import AuthContext, get_current_user
-from backend.core.exceptions import DomainValidationError
-from backend.integrations.billing.service import record_usage_event
 from backend.generation.base import GenerationRequest
 from backend.generation.service import GenerationService
+from backend.integrations.billing.service import record_usage_event
 from backend.retrieval.base import RetrievalConfig
 from backend.retrieval.service import RetrievalService
 
@@ -28,7 +27,7 @@ class QueryRequest(BaseModel):
     index_id: uuid.UUID
     top_k: int = Field(default=5, ge=1, le=50)
     min_score: float = Field(default=0.0, ge=0.0, le=1.0)
-    filters: Optional[Dict[str, Any]] = None
+    filters: Optional[dict[str, Any]] = None
     template_name: str = "rag_default"
     max_tokens: int = Field(default=1024, ge=64, le=4096)
     temperature: float = Field(default=0.2, ge=0.0, le=2.0)
@@ -44,7 +43,7 @@ class SourceChunk(BaseModel):
 
 class QueryResponse(BaseModel):
     answer: str
-    sources: List[SourceChunk]
+    sources: list[SourceChunk]
     model: str
     latency_ms: float
     prompt_tokens: int
@@ -55,13 +54,13 @@ class RAGQueryRequest(BaseModel):
     query: str = Field(..., min_length=1, max_length=2000)
     index_id: uuid.UUID
     top_k: int = Field(default=5, ge=1, le=50)
-    context_sources: Optional[List[str]] = None
+    context_sources: Optional[list[str]] = None
     template_name: str = "rag_default"
 
 
 class RAGQueryResponse(BaseModel):
     response_text: str
-    source_docs: List[SourceChunk]
+    source_docs: list[SourceChunk]
     confidence_score: float
     latency_ms: float
 
@@ -81,6 +80,7 @@ def get_generation_service() -> GenerationService:
 
 def get_embedding_service():
     from backend.embedding.service import EmbeddingService
+
     return EmbeddingService()
 
 

@@ -11,7 +11,6 @@ automatically via context variables.
 import json
 import logging
 import sys
-import traceback
 from contextvars import ContextVar
 from datetime import datetime, timezone
 from typing import Optional
@@ -27,6 +26,7 @@ auth_subject_var: ContextVar[Optional[str]] = ContextVar("auth_subject", default
 # ---------------------------------------------------------------------------
 # JSON log formatter
 # ---------------------------------------------------------------------------
+
 
 class JSONFormatter(logging.Formatter):
     """Emit each log record as a single-line JSON object."""
@@ -63,10 +63,28 @@ class JSONFormatter(logging.Formatter):
 
         # Any extra fields attached via ``logger.info("msg", extra={"foo": "bar"})``
         _standard_attrs = logging.LogRecord.__dict__.keys() | {
-            "message", "asctime", "msg", "args", "exc_info", "exc_text",
-            "stack_info", "created", "msecs", "relativeCreated", "thread",
-            "threadName", "process", "processName", "pathname", "filename",
-            "module", "funcName", "lineno", "levelno", "levelname", "name",
+            "message",
+            "asctime",
+            "msg",
+            "args",
+            "exc_info",
+            "exc_text",
+            "stack_info",
+            "created",
+            "msecs",
+            "relativeCreated",
+            "thread",
+            "threadName",
+            "process",
+            "processName",
+            "pathname",
+            "filename",
+            "module",
+            "funcName",
+            "lineno",
+            "levelno",
+            "levelname",
+            "name",
         }
         for key, value in record.__dict__.items():
             if key not in _standard_attrs:
@@ -79,6 +97,7 @@ class JSONFormatter(logging.Formatter):
 # Public helper
 # ---------------------------------------------------------------------------
 
+
 def configure_logging(log_level: str = "INFO") -> None:
     """Configure root logger with JSON output to stdout.
 
@@ -90,8 +109,7 @@ def configure_logging(log_level: str = "INFO") -> None:
     root.setLevel(numeric_level)
 
     # Avoid duplicate handlers if called more than once
-    if any(isinstance(h, logging.StreamHandler) and h.stream is sys.stdout
-           for h in root.handlers):
+    if any(isinstance(h, logging.StreamHandler) and h.stream is sys.stdout for h in root.handlers):
         return
 
     handler = logging.StreamHandler(sys.stdout)

@@ -10,11 +10,11 @@ import asyncio
 import datetime
 from typing import TYPE_CHECKING, Any, Optional
 
-from backend.ingestion.storage.base import StorageBackend, UploadSpec
 from backend.core.exceptions import NotFoundError
+from backend.ingestion.storage.base import StorageBackend, UploadSpec
 
 if TYPE_CHECKING:
-    from google.cloud import storage as gcs_storage
+    pass
 
 _GCS_AVAILABLE: Optional[bool] = None
 

@@ -1,8 +1,8 @@
 """Base types for chunking strategies."""
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
-from typing import List, Optional
+from dataclasses import dataclass
+from typing import Optional
 
 
 @dataclass
@@ -21,8 +21,7 @@ class BaseChunker(ABC):
     """Split text into a sequence of ChunkResults."""
 
     @abstractmethod
-    def chunk(self, text: str) -> List[ChunkResult]:
-        ...
+    def chunk(self, text: str) -> list[ChunkResult]: ...
 
     @staticmethod
     def _estimate_tokens(text: str) -> int:

@@ -11,7 +11,6 @@ from backend.retrieval.hybrid import HybridRetrievalConfig, HybridRetrievalServi
 from backend.retrieval.mmr import mmr_rerank
 from backend.vector_store.base import SearchResult
 
-
 # ---------------------------------------------------------------------------
 # BM25Scorer
 # ---------------------------------------------------------------------------
@@ -54,8 +53,7 @@ def test_bm25_multiple_docs():
 
 def _result(chunk_id: str, score: float) -> RetrievalResult:
     return RetrievalResult(
-        chunk_id=chunk_id, document_id="d", workspace_id="w",
-        text=chunk_id, score=score
+        chunk_id=chunk_id, document_id="d", workspace_id="w", text=chunk_id, score=score
     )
 
 
@@ -119,7 +117,8 @@ def _make_store_with_hits(*hits) -> MagicMock:
 
 def _hit(id_: str, score: float, text: str = "") -> SearchResult:
     return SearchResult(
-        id=id_, score=score,
+        id=id_,
+        score=score,
         metadata={"document_id": "d", "workspace_id": "w", "text": text, "chunk_index": 0},
     )
 

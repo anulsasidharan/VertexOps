@@ -1,9 +1,9 @@
 """Subject/body builders for supported notification event types."""
 
-from typing import Any, Dict, Tuple
+from typing import Any
 
 
-def eval_completed_email(payload: Dict[str, Any]) -> Tuple[str, str]:
+def eval_completed_email(payload: dict[str, Any]) -> tuple[str, str]:
     run_id = payload.get("run_id", "?")
     subject = f"[VertexOps] Evaluation run {run_id} completed"
     body = (
@@ -13,20 +13,20 @@ def eval_completed_email(payload: Dict[str, Any]) -> Tuple[str, str]:
     return subject, body
 
 
-def eval_completed_sms(payload: Dict[str, Any]) -> str:
+def eval_completed_sms(payload: dict[str, Any]) -> str:
     run_id = payload.get("run_id", "?")
     status = payload.get("status", "?")
     return f"VertexOps eval {run_id} done: {status}"
 
 
-def deployment_changed_email(payload: Dict[str, Any]) -> Tuple[str, str]:
+def deployment_changed_email(payload: dict[str, Any]) -> tuple[str, str]:
     dep = payload.get("deployment_id", "?")
     subject = f"[VertexOps] Deployment {dep} updated"
     body = str(payload.get("summary", "Deployment metadata changed."))
     return subject, body
 
 
-def critical_failure_email(payload: Dict[str, Any]) -> Tuple[str, str]:
+def critical_failure_email(payload: dict[str, Any]) -> tuple[str, str]:
     subject = "[VertexOps] Critical failure alert"
     body = str(payload.get("message", "See logs for details."))
     return subject, body

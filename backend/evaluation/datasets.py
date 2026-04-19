@@ -1,19 +1,19 @@
 """Deterministic evaluation dataset helpers (no live LLM)."""
 
-from typing import Any, Dict, List
+from typing import Any
 
 
 def build_synthetic_eval_cases_from_chunk_texts(
-    chunk_texts: List[str],
+    chunk_texts: list[str],
     *,
     max_cases: int = 50,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """Derive simple Q/A-style eval rows from corpus chunk strings.
 
     Used for offline or smoke evaluation when no curated set exists.
     ``predicted`` is left empty for a runner to fill via RAG.
     """
-    out: List[Dict[str, Any]] = []
+    out: list[dict[str, Any]] = []
     for i, raw in enumerate(chunk_texts):
         if len(out) >= max_cases:
             break

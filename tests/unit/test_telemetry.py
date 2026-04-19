@@ -2,9 +2,7 @@
 
 import logging
 import uuid
-from unittest.mock import MagicMock, patch
-
-import pytest
+from unittest.mock import patch
 
 from backend.core.audit import AuditEvent, emit
 from backend.core.telemetry import (
@@ -15,7 +13,6 @@ from backend.core.telemetry import (
     initialise_app_info,
     setup_otel,
 )
-
 
 # ---------------------------------------------------------------------------
 # Prometheus metrics — smoke tests (counters / histograms are module singletons)

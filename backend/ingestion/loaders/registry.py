@@ -1,7 +1,7 @@
 """Loader registry — maps file extensions and MIME types to loader classes."""
 
 from pathlib import Path
-from typing import Dict, Optional, Type
+from typing import Optional
 
 from backend.ingestion.loaders.base import BaseLoader
 from backend.ingestion.loaders.csv import CsvLoader
@@ -11,7 +11,7 @@ from backend.ingestion.loaders.markdown import MarkdownLoader
 from backend.ingestion.loaders.pdf import PdfLoader
 from backend.ingestion.loaders.txt import TxtLoader
 
-_EXTENSION_MAP: Dict[str, Type[BaseLoader]] = {
+_EXTENSION_MAP: dict[str, type[BaseLoader]] = {
     ".txt": TxtLoader,
     ".md": MarkdownLoader,
     ".markdown": MarkdownLoader,
@@ -22,7 +22,7 @@ _EXTENSION_MAP: Dict[str, Type[BaseLoader]] = {
     ".docx": DocxLoader,
 }
 
-_MIME_MAP: Dict[str, Type[BaseLoader]] = {
+_MIME_MAP: dict[str, type[BaseLoader]] = {
     "text/plain": TxtLoader,
     "text/markdown": MarkdownLoader,
     "text/html": HtmlLoader,

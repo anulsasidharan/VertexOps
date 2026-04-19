@@ -1,7 +1,6 @@
 """WebSocket connection manager — tracks active connections per channel."""
 
 import logging
-from typing import Dict, List
 
 from fastapi import WebSocket
 
@@ -12,7 +11,7 @@ class ConnectionManager:
     """Thread-safe registry of active WebSocket connections grouped by channel."""
 
     def __init__(self) -> None:
-        self._channels: Dict[str, List[WebSocket]] = {}
+        self._channels: dict[str, list[WebSocket]] = {}
 
     async def connect(self, websocket: WebSocket, channel: str) -> None:
         await websocket.accept()
@@ -29,7 +28,7 @@ class ConnectionManager:
 
     async def broadcast(self, channel: str, message: dict) -> None:
         """Send JSON message to all connections on a channel."""
-        dead: List[WebSocket] = []
+        dead: list[WebSocket] = []
         for ws in list(self._channels.get(channel, [])):
             try:
                 await ws.send_json(message)

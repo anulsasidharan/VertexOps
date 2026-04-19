@@ -1,6 +1,6 @@
 """Repository for Document aggregate."""
 
-from typing import List, Optional
+from typing import Optional
 from uuid import UUID
 
 from sqlalchemy import func, select
@@ -22,13 +22,13 @@ class DocumentRepository(BaseRepository[Document]):
         )
         return result.scalars().first()
 
-    async def list_by_workspace(self, workspace_id: UUID) -> List[Document]:
+    async def list_by_workspace(self, workspace_id: UUID) -> list[Document]:
         result = await self.session.execute(
             select(Document).where(Document.workspace_id == workspace_id)
         )
         return list(result.scalars().all())
 
-    async def list_by_status(self, ingest_status: str) -> List[Document]:
+    async def list_by_status(self, ingest_status: str) -> list[Document]:
         result = await self.session.execute(
             select(Document).where(Document.ingest_status == ingest_status)
         )
@@ -36,7 +36,7 @@ class DocumentRepository(BaseRepository[Document]):
 
     async def list_by_workspace_and_status(
         self, workspace_id: UUID, ingest_status: str
-    ) -> List[Document]:
+    ) -> list[Document]:
         result = await self.session.execute(
             select(Document).where(
                 Document.workspace_id == workspace_id,
@@ -47,15 +47,11 @@ class DocumentRepository(BaseRepository[Document]):
 
     async def count_by_workspace(self, workspace_id: UUID) -> int:
         result = await self.session.execute(
-            select(func.count())
-            .select_from(Document)
-            .where(Document.workspace_id == workspace_id)
+            select(func.count()).select_from(Document).where(Document.workspace_id == workspace_id)
         )
         return result.scalar_one()
 
-    async def count_by_workspace_and_status(
-        self, workspace_id: UUID, ingest_status: str
-    ) -> int:
+    async def count_by_workspace_and_status(self, workspace_id: UUID, ingest_status: str) -> int:
         result = await self.session.execute(
             select(func.count())
             .select_from(Document)
@@ -68,7 +64,7 @@ class DocumentRepository(BaseRepository[Document]):
 
     async def list_by_workspace_paginated(
         self, workspace_id: UUID, offset: int, limit: int
-    ) -> List[Document]:
+    ) -> list[Document]:
         result = await self.session.execute(
             select(Document)
             .where(Document.workspace_id == workspace_id)
@@ -80,7 +76,7 @@ class DocumentRepository(BaseRepository[Document]):
 
     async def list_by_workspace_and_status_paginated(
         self, workspace_id: UUID, ingest_status: str, offset: int, limit: int
-    ) -> List[Document]:
+    ) -> list[Document]:
         result = await self.session.execute(
             select(Document)
             .where(

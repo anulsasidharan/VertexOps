@@ -48,6 +48,4 @@ class Deployment(UUIDPrimaryKeyMixin, Base):
     )
 
     def __repr__(self) -> str:
-        return (
-            f"<Deployment id={self.id} env={self.environment!r} status={self.status!r}>"
-        )
+        return f"<Deployment id={self.id} env={self.environment!r} status={self.status!r}>"

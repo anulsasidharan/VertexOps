@@ -2,7 +2,7 @@
 
 import logging
 import uuid
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Callable, Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -23,15 +23,15 @@ class OrchestrationService:
         self,
         run_id: uuid.UUID,
         *,
-        failure_breakdown: Dict[str, int],
+        failure_breakdown: dict[str, int],
         trial_score: float,
-        current_config: Dict[str, Any],
+        current_config: dict[str, Any],
         best_score: float,
-        best_config: Dict[str, Any],
+        best_config: dict[str, Any],
         iteration: int,
         max_iterations: int,
         strategy_fn: Optional[Callable[[OptimizationState], str]] = None,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         graph = build_optimization_graph(strategy_fn=strategy_fn)
         state: OptimizationState = {
             "iteration": iteration,
@@ -42,7 +42,7 @@ class OrchestrationService:
             "best_score": best_score,
             "best_config": best_config,
         }
-        result: Dict[str, Any] = dict(graph.invoke(state))
+        result: dict[str, Any] = dict(graph.invoke(state))
 
         run = await self._run_repo.get(run_id)
         if run is None:

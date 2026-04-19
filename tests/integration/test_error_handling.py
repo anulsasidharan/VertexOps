@@ -1,6 +1,5 @@
 """Integration tests — error envelope and request context middleware."""
 
-import pytest
 from fastapi.testclient import TestClient
 
 from backend.main import app
@@ -46,6 +45,7 @@ class TestDomainExceptionHandler:
     def test_domain_error_envelope_shape(self):
         """Verify handler produces the correct envelope by raising via a test route."""
         from fastapi import APIRouter
+
         from backend.core.exceptions import NotFoundError
 
         # Mount a temporary route that raises a domain error

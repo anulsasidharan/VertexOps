@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict, Optional
+from typing import Any
 
 import httpx
 
@@ -17,12 +17,12 @@ def post_meter_usage(
     api_key: str,
     event_name: str,
     quantity: float,
-    metadata: Optional[Dict[str, Any]] = None,
+    metadata: dict[str, Any] | None = None,
     timeout_seconds: float = 10.0,
 ) -> None:
     """Send a meter event to Stripe. Raises on HTTP errors; callers should swallow."""
     meta = metadata or {}
-    data: Dict[str, str] = {
+    data: dict[str, str] = {
         "event_name": event_name,
         "payload[value]": str(int(quantity)) if quantity == int(quantity) else str(quantity),
     }

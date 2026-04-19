@@ -12,13 +12,12 @@ def _require_pypdf():
     global _PYPDF_AVAILABLE
     try:
         import pypdf  # noqa: F401
+
         _PYPDF_AVAILABLE = True
         return pypdf
     except ImportError:
         _PYPDF_AVAILABLE = False
-        raise ImportError(
-            "pypdf is required for PDF parsing. Install it with: pip install pypdf"
-        )
+        raise ImportError("pypdf is required for PDF parsing. Install it with: pip install pypdf")
 
 
 class PdfLoader(BaseLoader):

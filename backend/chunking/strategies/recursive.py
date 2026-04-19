@@ -1,6 +1,6 @@
 """Recursive character text splitter — tries separators in order."""
 
-from typing import List, Optional
+from typing import Optional
 
 from backend.chunking.base import BaseChunker, ChunkResult
 
@@ -12,13 +12,13 @@ class RecursiveChunker(BaseChunker):
         self,
         chunk_size: int = 512,
         chunk_overlap: int = 64,
-        separators: Optional[List[str]] = None,
+        separators: Optional[list[str]] = None,
     ) -> None:
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
         self.separators = separators if separators is not None else _DEFAULT_SEPARATORS
 
-    def chunk(self, text: str) -> List[ChunkResult]:
+    def chunk(self, text: str) -> list[ChunkResult]:
         if not text.strip():
             return []
         pieces = self._split_recursive(text, self.separators)
@@ -26,7 +26,7 @@ class RecursiveChunker(BaseChunker):
 
     # ------------------------------------------------------------------
 
-    def _split_recursive(self, text: str, separators: List[str]) -> List[str]:
+    def _split_recursive(self, text: str, separators: list[str]) -> list[str]:
         if len(text) <= self.chunk_size or not separators:
             return [text] if text.strip() else []
 
@@ -41,7 +41,7 @@ class RecursiveChunker(BaseChunker):
                 if text[i : i + self.chunk_size].strip()
             ]
 
-        expanded: List[str] = []
+        expanded: list[str] = []
         for piece in raw_pieces:
             if not piece.strip():
                 continue
@@ -52,10 +52,10 @@ class RecursiveChunker(BaseChunker):
 
         return self._merge_pieces(expanded)
 
-    def _merge_pieces(self, pieces: List[str]) -> List[str]:
+    def _merge_pieces(self, pieces: list[str]) -> list[str]:
         if not pieces:
             return []
-        merged: List[str] = []
+        merged: list[str] = []
         current = pieces[0]
         for piece in pieces[1:]:
             joined = current + " " + piece
@@ -67,8 +67,8 @@ class RecursiveChunker(BaseChunker):
         merged.append(current)
         return merged
 
-    def _assign_positions(self, texts: List[str], original: str) -> List[ChunkResult]:
-        results: List[ChunkResult] = []
+    def _assign_positions(self, texts: list[str], original: str) -> list[ChunkResult]:
+        results: list[ChunkResult] = []
         search_from = 0
         for idx, t in enumerate(texts):
             pos = original.find(t, search_from)

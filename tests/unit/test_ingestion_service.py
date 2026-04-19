@@ -1,13 +1,11 @@
 """Unit tests for ingestion loaders, validator, hashing, and ParseService."""
 
 import hashlib
-import io
-from pathlib import Path
-from typing import Optional
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
+from backend.core.exceptions import DomainValidationError
 from backend.ingestion.hashing import compute_content_hash
 from backend.ingestion.loaders.base import ParsedDocument
 from backend.ingestion.loaders.csv import CsvLoader
@@ -21,8 +19,6 @@ from backend.ingestion.validator import (
     SUPPORTED_EXTENSIONS,
     validate_file,
 )
-from backend.core.exceptions import DomainValidationError
-
 
 # ---------------------------------------------------------------------------
 # Hashing

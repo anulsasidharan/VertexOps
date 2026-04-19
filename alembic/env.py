@@ -3,10 +3,11 @@
 import asyncio
 from logging.config import fileConfig
 
-from alembic import context
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import create_async_engine
+
+from alembic import context
 
 # Alembic Config object — gives access to alembic.ini values.
 config = context.config
@@ -16,8 +17,8 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 # Import the declarative Base so Alembic can autogenerate migrations.
-from backend.models.base import Base  # noqa: E402
 from backend.core.config import get_settings  # noqa: E402
+from backend.models.base import Base  # noqa: E402
 
 target_metadata = Base.metadata
 

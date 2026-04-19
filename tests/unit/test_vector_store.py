@@ -1,10 +1,10 @@
 """Unit tests for vector store base types and Pinecone adapter."""
 
+from unittest.mock import MagicMock, patch
+
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
 
 from backend.vector_store.base import BaseVectorStore, SearchResult, VectorRecord
-
 
 # ---------------------------------------------------------------------------
 # Data classes
@@ -24,6 +24,7 @@ def test_search_result_defaults():
 
 def test_base_vector_store_is_abstract():
     import inspect
+
     assert inspect.isabstract(BaseVectorStore)
 
 
@@ -34,6 +35,7 @@ def test_base_vector_store_is_abstract():
 
 def _make_pinecone_store():
     from backend.vector_store.providers.pinecone import PineconeVectorStore
+
     store = PineconeVectorStore(api_key="pc-key", index_name="test-index")
     mock_index = MagicMock()
     store._index = mock_index
@@ -131,6 +133,7 @@ async def test_pinecone_delete_namespace():
 
 def test_pinecone_storage_uri():
     from backend.vector_store.providers.pinecone import PineconeVectorStore
+
     store = PineconeVectorStore(api_key="k", index_name="my-index")
     assert store._index_name == "my-index"
 
@@ -186,7 +189,6 @@ def test_factory_raises_when_no_provider():
 
 def test_factory_singleton():
     from backend.vector_store import service as svc_module
-    from backend.vector_store.providers.pinecone import PineconeVectorStore
 
     svc_module._store = None
     settings = MagicMock()

@@ -32,17 +32,13 @@ def ingest_document(self, document_id: str, workspace_id: str) -> dict:
     ws_uuid = UUID(workspace_id)
 
     try:
-        from backend.workers._runner import run_parse_document, run_embed_document
+        from backend.workers._runner import run_embed_document, run_parse_document
 
         parse_result = asyncio.run(run_parse_document(doc_uuid, ws_uuid))
-        logger.info(
-            "ingest_document: parse done — %d chunks", parse_result["chunk_count"]
-        )
+        logger.info("ingest_document: parse done — %d chunks", parse_result["chunk_count"])
 
         embed_result = asyncio.run(run_embed_document(doc_uuid, ws_uuid))
-        logger.info(
-            "ingest_document: embed done — %d vectors", embed_result["vector_count"]
-        )
+        logger.info("ingest_document: embed done — %d vectors", embed_result["vector_count"])
 
         return {
             "document_id": document_id,

@@ -1,8 +1,8 @@
 """Hybrid retrieval: fuses dense vector scores with BM25 lexical scores."""
 
 import logging
-from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from dataclasses import dataclass
+from typing import Any, Optional
 from uuid import UUID
 
 from backend.retrieval.base import RetrievalConfig, RetrievalResult
@@ -21,16 +21,16 @@ class HybridRetrievalConfig:
     top_k: int = 5
     min_score: float = 0.0
     namespace: Optional[str] = None
-    filters: Optional[Dict[str, Any]] = None
+    filters: Optional[dict[str, Any]] = None
     # Hybrid
-    alpha: float = 0.7          # weight for vector score (1-alpha goes to BM25)
+    alpha: float = 0.7  # weight for vector score (1-alpha goes to BM25)
     candidate_multiplier: int = 3  # fetch more candidates before fusion
     # MMR
     use_mmr: bool = False
     mmr_lambda: float = 0.5
 
 
-def _min_max_norm(scores: List[float]) -> List[float]:
+def _min_max_norm(scores: list[float]) -> list[float]:
     """Normalise scores to [0, 1]; returns all-zeros if range is zero."""
     lo, hi = min(scores), max(scores)
     if hi == lo:
@@ -50,10 +50,10 @@ class HybridRetrievalService:
 
     async def retrieve(
         self,
-        query_vector: List[float],
+        query_vector: list[float],
         query_text: str,
         config: HybridRetrievalConfig,
-    ) -> List[RetrievalResult]:
+    ) -> list[RetrievalResult]:
         """Fetch candidates, fuse vector + BM25 scores, optionally apply MMR."""
         # Fetch more candidates than needed for better fusion coverage
         base_cfg = RetrievalConfig(
@@ -75,36 +75,43 @@ class HybridRetrievalService:
 
         # Normalise both score lists
         vec_scores = _min_max_norm([c.score for c in candidates])
-        lex_norm = _min_max_norm(lex_scores) if any(s > 0 for s in lex_scores) else [0.0] * len(lex_scores)
+        lex_norm = (
+            _min_max_norm(lex_scores) if any(s > 0 for s in lex_scores) else [0.0] * len(lex_scores)
+        )
 
         # Fuse
-        fused: List[RetrievalResult] = []
+        fused: list[RetrievalResult] = []
         for i, result in enumerate(candidates):
             fused_score = config.alpha * vec_scores[i] + (1 - config.alpha) * lex_norm[i]
             if fused_score < config.min_score:
                 continue
-            fused.append(RetrievalResult(
-                chunk_id=result.chunk_id,
-                document_id=result.document_id,
-                workspace_id=result.workspace_id,
-                text=result.text,
-                score=fused_score,
-                chunk_index=result.chunk_index,
-                section_path=result.section_path,
-                metadata=result.metadata,
-            ))
+            fused.append(
+                RetrievalResult(
+                    chunk_id=result.chunk_id,
+                    document_id=result.document_id,
+                    workspace_id=result.workspace_id,
+                    text=result.text,
+                    score=fused_score,
+                    chunk_index=result.chunk_index,
+                    section_path=result.section_path,
+                    metadata=result.metadata,
+                )
+            )
 
         fused.sort(key=lambda r: r.score, reverse=True)
         top = fused[: config.top_k]
 
         if config.use_mmr and top:
             from backend.retrieval.mmr import mmr_rerank
+
             # Use fused score vector as proxy embedding for MMR (lightweight)
             proxy = [[r.score] for r in top]
             top = mmr_rerank(top, proxy, lambda_=config.mmr_lambda, top_k=config.top_k)
 
         logger.info(
             "hybrid retrieve: index=%s candidates=%d returned=%d",
-            config.index_id, len(candidates), len(top),
+            config.index_id,
+            len(candidates),
+            len(top),
         )
         return top

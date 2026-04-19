@@ -1,7 +1,6 @@
 """Prompt template registry for generation."""
 
 from dataclasses import dataclass
-from typing import Dict, List, Optional
 
 
 @dataclass
@@ -14,7 +13,7 @@ class PromptTemplate:
         return self.user_template.format(context=context, question=question)
 
 
-_REGISTRY: Dict[str, PromptTemplate] = {}
+_REGISTRY: dict[str, PromptTemplate] = {}
 
 
 def register_template(template: PromptTemplate) -> None:
@@ -27,42 +26,44 @@ def get_template(name: str) -> PromptTemplate:
     return _REGISTRY[name]
 
 
-def list_templates() -> List[str]:
+def list_templates() -> list[str]:
     return list(_REGISTRY)
 
 
 # Built-in templates
 
-register_template(PromptTemplate(
-    name="rag_default",
-    system=(
-        "You are a helpful AI assistant. Answer the user's question using only "
-        "the provided context. If the context does not contain enough information "
-        "to answer, say so clearly."
-    ),
-    user_template=(
-        "Context:\n{context}\n\nQuestion: {question}\n\nAnswer:"
-    ),
-))
+register_template(
+    PromptTemplate(
+        name="rag_default",
+        system=(
+            "You are a helpful AI assistant. Answer the user's question using only "
+            "the provided context. If the context does not contain enough information "
+            "to answer, say so clearly."
+        ),
+        user_template=("Context:\n{context}\n\nQuestion: {question}\n\nAnswer:"),
+    )
+)
 
-register_template(PromptTemplate(
-    name="rag_concise",
-    system=(
-        "You are a concise AI assistant. Answer in 1-3 sentences using only "
-        "the provided context. Be direct and factual."
-    ),
-    user_template=(
-        "Context:\n{context}\n\nQuestion: {question}\n\nBrief answer:"
-    ),
-))
+register_template(
+    PromptTemplate(
+        name="rag_concise",
+        system=(
+            "You are a concise AI assistant. Answer in 1-3 sentences using only "
+            "the provided context. Be direct and factual."
+        ),
+        user_template=("Context:\n{context}\n\nQuestion: {question}\n\nBrief answer:"),
+    )
+)
 
-register_template(PromptTemplate(
-    name="rag_technical",
-    system=(
-        "You are a technical AI assistant. Provide detailed, accurate answers "
-        "with code examples where relevant. Use only the provided context."
-    ),
-    user_template=(
-        "Technical context:\n{context}\n\nTechnical question: {question}\n\nDetailed answer:"
-    ),
-))
+register_template(
+    PromptTemplate(
+        name="rag_technical",
+        system=(
+            "You are a technical AI assistant. Provide detailed, accurate answers "
+            "with code examples where relevant. Use only the provided context."
+        ),
+        user_template=(
+            "Technical context:\n{context}\n\nTechnical question: {question}\n\nDetailed answer:"
+        ),
+    )
+)

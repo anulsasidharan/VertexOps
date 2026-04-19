@@ -2,7 +2,7 @@
 
 import logging
 import uuid
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -30,7 +30,7 @@ class EvaluationLifecycleService:
         *,
         workspace_id: uuid.UUID,
         experiment_id: uuid.UUID,
-        cases: List[Dict[str, Any]],
+        cases: list[dict[str, Any]],
     ) -> Run:
         await self._exp_svc.get(experiment_id, workspace_id)
         run = Run(
@@ -43,22 +43,16 @@ class EvaluationLifecycleService:
         logger.info("Queued evaluation run id=%s experiment=%s", run.id, experiment_id)
         return run
 
-    async def get_run_for_workspace(
-        self, run_id: uuid.UUID, workspace_id: uuid.UUID
-    ) -> Run:
+    async def get_run_for_workspace(self, run_id: uuid.UUID, workspace_id: uuid.UUID) -> Run:
         run = await self._run_repo.get(run_id)
         if run is None:
             raise NotFoundError(f"Evaluation run {run_id} not found.")
         await self._exp_svc.get(run.experiment_id, workspace_id)
         return run
 
-    async def get_detail(
-        self, run_id: uuid.UUID, workspace_id: uuid.UUID
-    ) -> Dict[str, Any]:
+    async def get_detail(self, run_id: uuid.UUID, workspace_id: uuid.UUID) -> dict[str, Any]:
         run = await self.get_run_for_workspace(run_id, workspace_id)
-        snap: Optional[MetricSnapshot] = await self._eval_svc.get_latest_snapshot(
-            run.id
-        )
+        snap: Optional[MetricSnapshot] = await self._eval_svc.get_latest_snapshot(run.id)
         return {
             "id": run.id,
             "experiment_id": run.experiment_id,

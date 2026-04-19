@@ -3,7 +3,7 @@
 import hashlib
 import json
 from datetime import datetime
-from typing import Annotated, Any, Dict, List, Literal, Optional
+from typing import Annotated, Any, Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, status
@@ -29,7 +29,7 @@ class IndexCreateRequest(BaseModel):
     name: str
     vector_backend: str = "pinecone"
     namespace: Optional[str] = None
-    index_config: Optional[Dict[str, Any]] = None
+    index_config: Optional[dict[str, Any]] = None
 
 
 class IndexResponse(BaseModel):
@@ -39,7 +39,7 @@ class IndexResponse(BaseModel):
     vector_backend: Optional[str]
     namespace: Optional[str]
     config_hash: Optional[str]
-    index_config: Optional[Dict[str, Any]]
+    index_config: Optional[dict[str, Any]]
     status: str
     created_at: datetime
     updated_at: datetime
@@ -48,7 +48,7 @@ class IndexResponse(BaseModel):
 
 
 class IndexListResponse(BaseModel):
-    items: List[IndexResponse]
+    items: list[IndexResponse]
     total: int
 
 
@@ -57,7 +57,7 @@ class IndexListResponse(BaseModel):
 # ---------------------------------------------------------------------------
 
 
-def _compute_config_hash(config: Optional[Dict[str, Any]]) -> Optional[str]:
+def _compute_config_hash(config: Optional[dict[str, Any]]) -> Optional[str]:
     if not config:
         return None
     serialised = json.dumps(config, sort_keys=True)
@@ -74,9 +74,7 @@ def get_index_service(db: AsyncSession = Depends(get_db)) -> IndexRepository:
     return IndexRepository(db)
 
 
-async def _get_owned(
-    repo: IndexRepository, workspace_id: UUID, index_id: UUID
-) -> VectorIndex:
+async def _get_owned(repo: IndexRepository, workspace_id: UUID, index_id: UUID) -> VectorIndex:
     idx = await repo.get(index_id)
     if idx is None:
         raise NotFoundError(f"Index {index_id} not found.")

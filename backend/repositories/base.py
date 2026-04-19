@@ -1,6 +1,6 @@
 """Generic async repository base for SQLAlchemy 2.0."""
 
-from typing import Generic, List, Optional, Type, TypeVar
+from typing import Generic, Optional, TypeVar
 from uuid import UUID
 
 from sqlalchemy import select
@@ -19,7 +19,7 @@ class BaseRepository(Generic[ModelT]):
     calling layer controls the commit boundary.
     """
 
-    model: Type[ModelT]
+    model: type[ModelT]
 
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
@@ -27,7 +27,7 @@ class BaseRepository(Generic[ModelT]):
     async def get(self, id: UUID) -> Optional[ModelT]:
         return await self.session.get(self.model, id)
 
-    async def list(self) -> List[ModelT]:
+    async def list(self) -> list[ModelT]:
         result = await self.session.execute(select(self.model))
         return list(result.scalars().all())
 

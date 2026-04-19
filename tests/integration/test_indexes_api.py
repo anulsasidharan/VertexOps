@@ -9,7 +9,6 @@ from fastapi.testclient import TestClient
 from backend.api.dependencies import get_current_user
 from backend.api.dependencies.auth import AuthContext
 from backend.api.v1.indexes import get_index_service
-from backend.core.exceptions import ForbiddenError, NotFoundError
 from backend.main import app
 from backend.repositories.index_repository import IndexRepository
 
@@ -20,9 +19,7 @@ _NOW = datetime(2026, 4, 17, 12, 0, 0)
 
 
 def _auth(workspace_id=_WS_ID):
-    return AuthContext(
-        user_id=_USER_ID, role="member", workspace_id=workspace_id, auth_type="jwt"
-    )
+    return AuthContext(user_id=_USER_ID, role="member", workspace_id=workspace_id, auth_type="jwt")
 
 
 def _make_idx(**kwargs):

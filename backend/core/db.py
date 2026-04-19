@@ -1,7 +1,8 @@
 """SQLAlchemy 2.0 async engine, session factory, and FastAPI dependency."""
 
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator, Optional
+from typing import Optional
 
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import (

@@ -2,7 +2,7 @@
 
 import uuid
 from datetime import datetime
-from typing import TYPE_CHECKING, Any, Dict, Optional
+from typing import TYPE_CHECKING, Any, Optional
 
 from sqlalchemy import DateTime, ForeignKey, Index, func
 from sqlalchemy.dialects.postgresql import JSONB, UUID
@@ -22,7 +22,7 @@ class MetricSnapshot(UUIDPrimaryKeyMixin, Base):
         ForeignKey("runs.id", ondelete="CASCADE"),
         nullable=False,
     )
-    snapshot_metrics: Mapped[Optional[Dict[str, Any]]] = mapped_column(
+    snapshot_metrics: Mapped[Optional[dict[str, Any]]] = mapped_column(
         "metrics", JSONB, nullable=True
     )
     created_at: Mapped[datetime] = mapped_column(

@@ -20,7 +20,9 @@ def run_evaluation(self, run_id: str) -> dict:
     logger.info("run_evaluation: run=%s", run_id)
     try:
         import asyncio
+
         from backend.workers._runner import run_eval
+
         result = asyncio.run(run_eval(UUID(run_id)))
         return result
     except Exception as exc:

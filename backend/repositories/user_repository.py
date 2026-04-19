@@ -1,6 +1,6 @@
 """Repository for User aggregate."""
 
-from typing import List, Optional
+from typing import Optional
 from uuid import UUID
 
 from sqlalchemy import select
@@ -17,13 +17,9 @@ class UserRepository(BaseRepository[User]):
         super().__init__(session)
 
     async def get_by_email(self, email: str) -> Optional[User]:
-        result = await self.session.execute(
-            select(User).where(User.email == email)
-        )
+        result = await self.session.execute(select(User).where(User.email == email))
         return result.scalars().first()
 
-    async def list_by_workspace(self, workspace_id: UUID) -> List[User]:
-        result = await self.session.execute(
-            select(User).where(User.workspace_id == workspace_id)
-        )
+    async def list_by_workspace(self, workspace_id: UUID) -> list[User]:
+        result = await self.session.execute(select(User).where(User.workspace_id == workspace_id))
         return list(result.scalars().all())

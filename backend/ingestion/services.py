@@ -1,7 +1,7 @@
 """Ingestion services — document CRUD and file parsing/deduplication."""
 
 import uuid
-from typing import List, Optional, Tuple
+from typing import Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -44,7 +44,7 @@ class DocumentService:
         self,
         workspace_id: uuid.UUID,
         req: PrepareUploadRequest,
-    ) -> Tuple[Document, UploadSpec]:
+    ) -> tuple[Document, UploadSpec]:
         doc_id = uuid.uuid4()
         storage_key = document_storage_key(workspace_id, doc_id, req.filename)
         spec = await self._storage.prepare_upload(
@@ -85,7 +85,7 @@ class DocumentService:
         status: Optional[str],
         limit: int,
         offset: int,
-    ) -> Tuple[List[Document], int]:
+    ) -> tuple[list[Document], int]:
         if status:
             total = await self._repo.count_by_workspace_and_status(workspace_id, status)
             items = await self._repo.list_by_workspace_and_status_paginated(
@@ -106,9 +106,7 @@ class DocumentService:
             except Exception:
                 pass  # best-effort; DB record is already gone
 
-    async def _get_owned(
-        self, workspace_id: uuid.UUID, document_id: uuid.UUID
-    ) -> Document:
+    async def _get_owned(self, workspace_id: uuid.UUID, document_id: uuid.UUID) -> Document:
         doc = await self._repo.get(document_id)
         if doc is None:
             raise NotFoundError(f"Document {document_id} not found.")

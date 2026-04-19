@@ -1,6 +1,6 @@
 """Workspace ORM model."""
 
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING
 
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -16,9 +16,7 @@ class Workspace(UUIDPrimaryKeyMixin, TimestampMixin, Base):
 
     name: Mapped[str] = mapped_column(String(255), nullable=False)
 
-    users: Mapped[List["User"]] = relationship(
-        "User", back_populates="workspace", lazy="select"
-    )
+    users: Mapped[list["User"]] = relationship("User", back_populates="workspace", lazy="select")
 
     def __repr__(self) -> str:
         return f"<Workspace id={self.id} name={self.name!r}>"

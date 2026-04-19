@@ -29,9 +29,7 @@ class APIKey(UUIDPrimaryKeyMixin, Base):
         server_default=func.now(),
         nullable=False,
     )
-    last_used_at: Mapped[Optional[datetime]] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
+    last_used_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
 
     user: Mapped["User"] = relationship("User", back_populates="api_keys", lazy="select")
 

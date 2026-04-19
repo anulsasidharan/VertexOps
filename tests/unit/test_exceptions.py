@@ -69,7 +69,12 @@ class TestDomainExceptions:
 
     def test_base_is_vertex_ops_error(self):
         for cls in (
-            NotFoundError, ForbiddenError, UnauthorizedError,
-            ConflictError, DomainValidationError, RateLimitError, InternalError,
+            NotFoundError,
+            ForbiddenError,
+            UnauthorizedError,
+            ConflictError,
+            DomainValidationError,
+            RateLimitError,
+            InternalError,
         ):
             assert issubclass(cls, VertexOpsError)

@@ -1,7 +1,6 @@
 """Generation service — assembles context, applies token budgeting, calls provider."""
 
 import logging
-from typing import List, Optional
 
 from backend.generation.base import GenerationRequest, GenerationResponse
 from backend.generation.templates import get_template
@@ -22,9 +21,7 @@ class GenerationService:
         template = get_template(request.template_name)
         system = request.system_prompt or template.system
 
-        context = self._build_context(
-            request.context_chunks, request.max_tokens, system
-        )
+        context = self._build_context(request.context_chunks, request.max_tokens, system)
         user_message = template.render(context=context, question=request.question)
 
         try:
@@ -40,7 +37,7 @@ class GenerationService:
 
     def _build_context(
         self,
-        chunks: List[str],
+        chunks: list[str],
         max_tokens: int,
         system: str,
         reserved_answer_tokens: int = 256,
@@ -55,7 +52,7 @@ class GenerationService:
         if budget <= 0:
             return ""
 
-        parts: List[str] = []
+        parts: list[str] = []
         used = 0
         for chunk in chunks:
             chunk_tokens = len(chunk) // _CHARS_PER_TOKEN
@@ -69,9 +66,11 @@ class GenerationService:
 
 def _build_default_provider():
     from backend.core.config import get_settings
+
     settings = get_settings()
     if settings.openai_api_key:
         from backend.generation.providers.openai import OpenAIChatProvider
+
         return OpenAIChatProvider(
             api_key=settings.openai_api_key.get_secret_value(),
             model=settings.openai_chat_model,

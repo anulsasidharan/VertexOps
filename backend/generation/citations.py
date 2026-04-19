@@ -1,7 +1,7 @@
 """Source citation formatting and document traceability for RAG responses."""
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 
 @dataclass
@@ -13,7 +13,7 @@ class Citation:
     score: float
     text_excerpt: str
     section_path: Optional[str] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     @property
     def short_excerpt(self) -> str:
@@ -21,7 +21,7 @@ class Citation:
         return self.text_excerpt[:200] + ("…" if len(self.text_excerpt) > 200 else "")
 
 
-def build_citations(retrieval_results) -> List[Citation]:
+def build_citations(retrieval_results) -> list[Citation]:
     """Convert retrieval results into Citation objects.
 
     Accepts any objects with the attributes chunk_id, document_id, score,
@@ -40,7 +40,7 @@ def build_citations(retrieval_results) -> List[Citation]:
     ]
 
 
-def format_citations_markdown(citations: List[Citation]) -> str:
+def format_citations_markdown(citations: list[Citation]) -> str:
     """Render citations as a Markdown reference list."""
     if not citations:
         return ""
@@ -51,6 +51,6 @@ def format_citations_markdown(citations: List[Citation]) -> str:
     return "\n".join(lines)
 
 
-def annotate_answer(answer: str, citations: List[Citation]) -> str:
+def annotate_answer(answer: str, citations: list[Citation]) -> str:
     """Append a citation block to the answer text."""
     return answer + format_citations_markdown(citations)

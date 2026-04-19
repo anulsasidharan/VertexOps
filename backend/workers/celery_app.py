@@ -8,6 +8,7 @@ from backend.workers.queues import QUEUES, TASK_ROUTES
 def create_celery_app() -> Celery:
     """Build and configure the Celery app from application settings."""
     from backend.core.config import get_settings
+
     settings = get_settings()
 
     app = Celery("vertexops")

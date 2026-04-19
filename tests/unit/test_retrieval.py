@@ -5,7 +5,7 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from backend.retrieval.base import RetrievalConfig, RetrievalResult
+from backend.retrieval.base import RetrievalConfig
 from backend.retrieval.service import RetrievalService
 from backend.vector_store.base import SearchResult
 
@@ -25,9 +25,13 @@ async def test_retrieve_returns_results():
     store.search = AsyncMock(
         return_value=[
             _make_hit(
-                "chunk-1", 0.9,
-                document_id="doc-1", workspace_id="ws-1",
-                text="hello", chunk_index=0, section_path="intro",
+                "chunk-1",
+                0.9,
+                document_id="doc-1",
+                workspace_id="ws-1",
+                text="hello",
+                chunk_index=0,
+                section_path="intro",
             )
         ]
     )
@@ -105,7 +109,9 @@ async def test_retrieve_filters_below_min_score():
 async def test_retrieve_empty_when_all_below_threshold():
     store = MagicMock()
     store.search = AsyncMock(
-        return_value=[_make_hit("c1", 0.1, document_id="d", workspace_id="w", text="x", chunk_index=0)]
+        return_value=[
+            _make_hit("c1", 0.1, document_id="d", workspace_id="w", text="x", chunk_index=0)
+        ]
     )
     svc = RetrievalService(vector_store=store)
     cfg = RetrievalConfig(index_id=uuid.uuid4(), top_k=5, min_score=0.9)

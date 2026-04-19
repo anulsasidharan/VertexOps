@@ -2,22 +2,22 @@
 
 import re
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 
 @dataclass
 class CaseMetrics:
     """Per-case metrics computed after a single evaluation case executes."""
 
-    relevance: float = 0.0       # 0-1: how relevant the answer is to the question
-    faithfulness: float = 0.0    # 0-1: how faithfully answer reflects context
+    relevance: float = 0.0  # 0-1: how relevant the answer is to the question
+    faithfulness: float = 0.0  # 0-1: how faithfully answer reflects context
     latency_ms: float = 0.0
     token_count: int = 0
     cost_usd: float = 0.0
     failure_type: Optional[str] = None
-    extra: Dict[str, Any] = field(default_factory=dict)
+    extra: dict[str, Any] = field(default_factory=dict)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "relevance": self.relevance,
             "faithfulness": self.faithfulness,
@@ -41,9 +41,9 @@ class AggregateMetrics:
     total_cost_usd: float = 0.0
     failure_count: int = 0
     failure_rate: float = 0.0
-    failure_breakdown: Dict[str, int] = field(default_factory=dict)
+    failure_breakdown: dict[str, int] = field(default_factory=dict)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "case_count": self.case_count,
             "avg_relevance": round(self.avg_relevance, 4),
@@ -99,14 +99,14 @@ def compute_case_metrics(
     )
 
 
-def aggregate_case_metrics(cases: List[CaseMetrics]) -> AggregateMetrics:
+def aggregate_case_metrics(cases: list[CaseMetrics]) -> AggregateMetrics:
     """Roll up per-case metrics into a run-level summary."""
     n = len(cases)
     if n == 0:
         return AggregateMetrics()
 
     failures = [c for c in cases if c.failure_type is not None]
-    breakdown: Dict[str, int] = {}
+    breakdown: dict[str, int] = {}
     for c in failures:
         breakdown[c.failure_type] = breakdown.get(c.failure_type, 0) + 1  # type: ignore[index]
 

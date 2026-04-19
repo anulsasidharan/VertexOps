@@ -1,7 +1,7 @@
 """Index ORM model."""
 
 import uuid
-from typing import TYPE_CHECKING, Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, Optional
 
 from sqlalchemy import ForeignKey, Index, String
 from sqlalchemy.dialects.postgresql import JSONB, UUID
@@ -10,8 +10,8 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from backend.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
 
 if TYPE_CHECKING:
-    from backend.models.experiment import Experiment
     from backend.models.deployment import Deployment
+    from backend.models.experiment import Experiment
 
 
 class VectorIndex(UUIDPrimaryKeyMixin, TimestampMixin, Base):
@@ -26,19 +26,15 @@ class VectorIndex(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     vector_backend: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     namespace: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     config_hash: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)
-    index_config: Mapped[Optional[Dict[str, Any]]] = mapped_column(
-        "config", JSONB, nullable=True
-    )
-    status: Mapped[str] = mapped_column(
-        String(32), nullable=False, default="building"
-    )
+    index_config: Mapped[Optional[dict[str, Any]]] = mapped_column("config", JSONB, nullable=True)
+    status: Mapped[str] = mapped_column(String(32), nullable=False, default="building")
 
-    experiments: Mapped[List["Experiment"]] = relationship(
+    experiments: Mapped[list["Experiment"]] = relationship(
         "Experiment",
         back_populates="index",
         lazy="select",
     )
-    deployments: Mapped[List["Deployment"]] = relationship(
+    deployments: Mapped[list["Deployment"]] = relationship(
         "Deployment",
         back_populates="index",
         lazy="select",

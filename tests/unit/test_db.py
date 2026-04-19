@@ -10,10 +10,10 @@ from backend.core.db import check_db_connectivity, get_engine, get_session_facto
 from backend.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
 from backend.repositories.base import BaseRepository
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 class _DummyModel(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     __tablename__ = "dummy_for_tests"
@@ -26,6 +26,7 @@ class _DummyRepo(BaseRepository[_DummyModel]):
 # ---------------------------------------------------------------------------
 # Engine / session factory
 # ---------------------------------------------------------------------------
+
 
 def test_get_engine_returns_engine():
     engine = get_engine()
@@ -48,6 +49,7 @@ def test_get_session_factory_singleton():
 # ---------------------------------------------------------------------------
 # check_db_connectivity
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.asyncio
 async def test_check_db_connectivity_returns_true_on_success():
@@ -84,6 +86,7 @@ async def test_check_db_connectivity_returns_false_on_error():
 # ---------------------------------------------------------------------------
 # BaseRepository
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.asyncio
 async def test_repository_get_delegates_to_session():
@@ -142,6 +145,7 @@ async def test_repository_delete_calls_delete_and_flush():
 # ---------------------------------------------------------------------------
 # Model mixins
 # ---------------------------------------------------------------------------
+
 
 def test_uuid_primary_key_mixin_has_default():
     m = _DummyModel()

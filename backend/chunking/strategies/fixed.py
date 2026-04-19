@@ -1,7 +1,5 @@
 """Fixed-size chunking with configurable overlap."""
 
-from typing import List
-
 from backend.chunking.base import BaseChunker, ChunkResult
 
 
@@ -12,11 +10,11 @@ class FixedSizeChunker(BaseChunker):
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
 
-    def chunk(self, text: str) -> List[ChunkResult]:
+    def chunk(self, text: str) -> list[ChunkResult]:
         if not text.strip():
             return []
 
-        results: List[ChunkResult] = []
+        results: list[ChunkResult] = []
         start = 0
         idx = 0
 

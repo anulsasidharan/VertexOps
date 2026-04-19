@@ -1,7 +1,6 @@
 """Code-aware chunker — splits at top-level definition boundaries."""
 
 import re
-from typing import List
 
 from backend.chunking.base import BaseChunker, ChunkResult
 from backend.chunking.strategies.fixed import FixedSizeChunker
@@ -16,7 +15,7 @@ class CodeChunker(BaseChunker):
         self.chunk_overlap = chunk_overlap
         self._fixed = FixedSizeChunker(chunk_size, chunk_overlap)
 
-    def chunk(self, text: str) -> List[ChunkResult]:
+    def chunk(self, text: str) -> list[ChunkResult]:
         if not text.strip():
             return []
 
@@ -24,8 +23,8 @@ class CodeChunker(BaseChunker):
         merged = self._merge_blocks(blocks)
         return self._assign_positions(merged, text)
 
-    def _merge_blocks(self, blocks: List[str]) -> List[str]:
-        result: List[str] = []
+    def _merge_blocks(self, blocks: list[str]) -> list[str]:
+        result: list[str] = []
         current = ""
         for block in blocks:
             if len(block) > self.chunk_size:
@@ -45,8 +44,8 @@ class CodeChunker(BaseChunker):
             result.append(current)
         return result
 
-    def _assign_positions(self, texts: List[str], original: str) -> List[ChunkResult]:
-        results: List[ChunkResult] = []
+    def _assign_positions(self, texts: list[str], original: str) -> list[ChunkResult]:
+        results: list[ChunkResult] = []
         search_from = 0
         for idx, t in enumerate(texts):
             pos = original.find(t, search_from)

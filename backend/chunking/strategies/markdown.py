@@ -1,7 +1,6 @@
 """Markdown-aware chunker — splits at heading boundaries first."""
 
 import re
-from typing import List, Tuple
 
 from backend.chunking.base import BaseChunker, ChunkResult
 from backend.chunking.strategies.fixed import FixedSizeChunker
@@ -15,12 +14,12 @@ class MarkdownChunker(BaseChunker):
         self.chunk_overlap = chunk_overlap
         self._fixed = FixedSizeChunker(chunk_size, chunk_overlap)
 
-    def chunk(self, text: str) -> List[ChunkResult]:
+    def chunk(self, text: str) -> list[ChunkResult]:
         if not text.strip():
             return []
 
         sections = self._split_sections(text)
-        results: List[ChunkResult] = []
+        results: list[ChunkResult] = []
         global_idx = 0
         global_offset = 0
 
@@ -63,9 +62,9 @@ class MarkdownChunker(BaseChunker):
 
         return results
 
-    def _split_sections(self, text: str) -> List[Tuple[str, str]]:
+    def _split_sections(self, text: str) -> list[tuple[str, str]]:
         """Return (heading_text, content) pairs split at heading boundaries."""
-        sections: List[Tuple[str, str]] = []
+        sections: list[tuple[str, str]] = []
         current_heading = ""
         current_start = 0
 

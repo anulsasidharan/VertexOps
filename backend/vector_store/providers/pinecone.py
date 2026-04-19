@@ -1,7 +1,7 @@
 """Pinecone vector store adapter."""
 
 import asyncio
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 from backend.vector_store.base import BaseVectorStore, SearchResult, VectorRecord
 
@@ -12,14 +12,12 @@ def _require_pinecone():
     global _PINECONE_AVAILABLE
     try:
         from pinecone import Pinecone  # noqa: F401
+
         _PINECONE_AVAILABLE = True
-        from pinecone import Pinecone
         return Pinecone
     except ImportError:
         _PINECONE_AVAILABLE = False
-        raise ImportError(
-            "pinecone-client is required: pip install pinecone-client"
-        )
+        raise ImportError("pinecone-client is required: pip install pinecone-client")
 
 
 class PineconeVectorStore(BaseVectorStore):
@@ -42,7 +40,7 @@ class PineconeVectorStore(BaseVectorStore):
             self._index = self._client.Index(self._index_name)
         return self._index
 
-    async def upsert(self, records: List[VectorRecord]) -> int:
+    async def upsert(self, records: list[VectorRecord]) -> int:
         if not records:
             return 0
         index = self._get_index()
@@ -64,15 +62,15 @@ class PineconeVectorStore(BaseVectorStore):
 
     async def search(
         self,
-        vector: List[float],
+        vector: list[float],
         top_k: int = 10,
         namespace: Optional[str] = None,
-        filter: Optional[Dict[str, Any]] = None,
-    ) -> List[SearchResult]:
+        filter: Optional[dict[str, Any]] = None,
+    ) -> list[SearchResult]:
         index = self._get_index()
 
         def _do_query():
-            kwargs: Dict[str, Any] = {
+            kwargs: dict[str, Any] = {
                 "vector": vector,
                 "top_k": top_k,
                 "include_metadata": True,
@@ -92,7 +90,7 @@ class PineconeVectorStore(BaseVectorStore):
             for match in response.get("matches", [])
         ]
 
-    async def delete(self, ids: List[str], namespace: Optional[str] = None) -> None:
+    async def delete(self, ids: list[str], namespace: Optional[str] = None) -> None:
         if not ids:
             return
         index = self._get_index()

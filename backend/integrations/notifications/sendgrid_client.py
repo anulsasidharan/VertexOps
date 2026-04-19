@@ -1,7 +1,6 @@
 """SendGrid v3 mail-send helper (HTTP, no official SDK required)."""
 
 import logging
-from typing import List
 
 import httpx
 
@@ -12,7 +11,7 @@ def send_email_sendgrid(
     *,
     api_key: str,
     from_email: str,
-    to_emails: List[str],
+    to_emails: list[str],
     subject: str,
     body_text: str,
 ) -> None:

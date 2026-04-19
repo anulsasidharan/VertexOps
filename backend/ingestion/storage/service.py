@@ -32,16 +32,13 @@ def _create_backend() -> StorageBackend:
     if settings.storage_backend == "gcs":
         if not settings.gcs_bucket_name:
             logger.warning(
-                "storage_backend=gcs but gcs_bucket_name is unset — "
-                "falling back to local storage"
+                "storage_backend=gcs but gcs_bucket_name is unset — falling back to local storage"
             )
             return LocalStorageBackend(settings.storage_local_path)
 
         from backend.ingestion.storage.gcs import GCSStorageBackend
 
-        logger.info(
-            "storage: using GCS backend (bucket=%s)", settings.gcs_bucket_name
-        )
+        logger.info("storage: using GCS backend (bucket=%s)", settings.gcs_bucket_name)
         return GCSStorageBackend(settings.gcs_bucket_name)
 
     logger.info("storage: using local backend (path=%s)", settings.storage_local_path)
