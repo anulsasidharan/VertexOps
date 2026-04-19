@@ -37,7 +37,7 @@ and `docs/LDL.md`.
 | 2 | Establish DB, auth, and API base | Schema, auth, health, rate limits | Tasks 6-9 after Task 5 | ✅ Complete (Tasks 5-10) |
 | 3 | Build ingest to index pipeline | Upload, chunk, embed, vector indexing, workers | Tasks 12-17 after Task 11 | ✅ Complete (Tasks 11-19 ✅) |
 | 4 | Deliver RAG query capabilities | Retrieval, generation, citations, realtime | Tasks 21-24 after Task 20 | ✅ Complete (Tasks 20-25 ✅) |
-| 5 | Add experiments and optimization loop | Experiment runs, eval reports, orchestrator | Tasks 27-30 after Task 26 | Complete (Tasks 26-30) |
+| 5 | Add experiments and optimization loop | Experiment runs, eval reports, orchestrator | Tasks 27-30 after Task 26 | ✅ Complete (Tasks 26-30 ✅) |
 | 6 | Add UI and external product hooks | Dashboard, notifications, billing hooks | Tasks 32-35 after Task 31 | ✅ Complete (Tasks 31-35) |
 | 7 | Make platform deployable and automatable | Metrics, containers, CI/CD, cloud envs | Tasks 37-40 after Task 36 | Not Started |
 | 8 | Finish quality bar and release docs | E2E, hardening, roadmap closeout | Tasks 41-42 after Task 40 | Not Started |
@@ -395,7 +395,7 @@ and `docs/LDL.md`.
 
 ## Phase 5 - Experiments, Evaluation, and Optimization
 
-## Task #26: Experiments API and Registry Service
+## Task #26: Experiments API and Registry Service ✅
 - **Branch:** `feature/experiments-registry`
 - **Dependencies:** 8, 17, 19
 - **Parallelizable With:** None
@@ -408,7 +408,7 @@ and `docs/LDL.md`.
 - **Files/Modules Affected:** `backend/api/v1/experiments.py`, `backend/experiments/`, `backend/repositories/`, `tests/integration/`
 - **Estimated Complexity:** Medium
 
-## Task #27: Evaluation Dataset Generation and Metric Aggregation
+## Task #27: Evaluation Dataset Generation and Metric Aggregation ✅
 - **Branch:** `feature/eval-datasets-metrics`
 - **Dependencies:** 20, 22, 26
 - **Parallelizable With:** 28, 29
@@ -421,7 +421,7 @@ and `docs/LDL.md`.
 - **Files/Modules Affected:** `backend/evaluation/`, `backend/models/`, `backend/repositories/`, `tests/unit/`
 - **Estimated Complexity:** High
 
-## Task #28: Evaluation API, Reports, and Artifact Export
+## Task #28: Evaluation API, Reports, and Artifact Export ✅
 - **Branch:** `feature/evaluation-api-reports`
 - **Dependencies:** 18, 26, 27
 - **Parallelizable With:** 29
@@ -434,7 +434,7 @@ and `docs/LDL.md`.
 - **Files/Modules Affected:** `backend/api/v1/evaluations.py`, `backend/evaluation/`, `backend/workers/tasks/`, `tests/integration/`
 - **Estimated Complexity:** High
 
-## Task #29: MLflow Experiment Tracking Integration
+## Task #29: MLflow Experiment Tracking Integration ✅
 - **Branch:** `feature/mlflow-tracking`
 - **Dependencies:** 26, 27
 - **Parallelizable With:** 28, 30
@@ -447,7 +447,7 @@ and `docs/LDL.md`.
 - **Files/Modules Affected:** `backend/experiments/tracking/`, `backend/evaluation/`, `backend/core/config.py`, `tests/unit/`
 - **Estimated Complexity:** Medium
 
-## Task #30: LangGraph Orchestrator and Optimization Loop
+## Task #30: LangGraph Orchestrator and Optimization Loop ✅
 - **Branch:** `feature/langgraph-orchestrator`
 - **Dependencies:** 21, 25, 26, 27, 29
 - **Parallelizable With:** None
@@ -466,7 +466,7 @@ and `docs/LDL.md`.
 
 ## Phase 6 - Frontend and Product Integrations
 
-## Task #31: Frontend App Shell and Auth Session Flow
+## Task #31: Frontend App Shell and Auth Session Flow ✅
 - **Branch:** `feature/frontend-shell-auth`
 - **Dependencies:** 9, 10, 23
 - **Parallelizable With:** None
@@ -479,7 +479,7 @@ and `docs/LDL.md`.
 - **Files/Modules Affected:** `frontend/src/`, `frontend/package.json`, `frontend/vite.config.*`, `tests/`
 - **Estimated Complexity:** Medium
 
-## Task #32: Frontend Documents and Index Management Pages
+## Task #32: Frontend Documents and Index Management Pages ✅
 - **Branch:** `feature/frontend-documents-indexes`
 - **Dependencies:** 12, 17, 31
 - **Parallelizable With:** 33, 34
@@ -492,7 +492,7 @@ and `docs/LDL.md`.
 - **Files/Modules Affected:** `frontend/src/pages/`, `frontend/src/components/`, `frontend/src/api/`
 - **Estimated Complexity:** Medium
 
-## Task #33: Frontend Query Playground and Evaluation Views
+## Task #33: Frontend Query Playground and Evaluation Views ✅
 - **Branch:** `feature/frontend-query-evals`
 - **Dependencies:** 23, 28, 31
 - **Parallelizable With:** 32, 34
@@ -505,7 +505,7 @@ and `docs/LDL.md`.
 - **Files/Modules Affected:** `frontend/src/pages/`, `frontend/src/components/`, `frontend/src/hooks/`
 - **Estimated Complexity:** Medium
 
-## Task #34: Notification Integrations with SendGrid and Twilio
+## Task #34: Notification Integrations with SendGrid and Twilio ✅
 - **Branch:** `feature/notifications-sendgrid-twilio`
 - **Dependencies:** 28, 31
 - **Parallelizable With:** 32, 33, 35
@@ -518,7 +518,7 @@ and `docs/LDL.md`.
 - **Files/Modules Affected:** `backend/integrations/notifications/`, `backend/workers/`, `backend/core/config.py`, `tests/unit/`
 - **Estimated Complexity:** Medium
 
-## Task #35: Stripe Billing Hooks for Usage Metering
+## Task #35: Stripe Billing Hooks for Usage Metering ✅
 - **Branch:** `feature/stripe-usage-hooks`
 - **Dependencies:** 27, 31
 - **Parallelizable With:** 34

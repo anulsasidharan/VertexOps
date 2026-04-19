@@ -38,11 +38,16 @@ flowchart LR
 
 ### 2.1 Python environment
 
+Dependencies are declared in `pyproject.toml` and locked in `uv.lock`. Use **[uv](https://docs.astral.sh/uv/)** to create `.venv` and install packages:
+
 ```bash
-python -m venv .venv
-.venv\Scripts\activate
-pip install -r requirements.txt
+# Install uv (one-time): https://docs.astral.sh/uv/getting-started/installation/
+uv sync --all-groups          # app + dev tools (pytest, ruff, …)
+# or runtime only:
+uv sync
 ```
+
+Run CLI tools through the project environment, for example: `uv run alembic upgrade head`, `uv run uvicorn backend.main:app --reload`.
 
 Copy `.env.example` to `.env` and set variables (see §4). Never commit secrets.
 

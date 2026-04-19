@@ -44,6 +44,10 @@ def test_verify_password_wrong():
     assert verify_password("wrong-horse", h) is False
 
 
+def test_verify_password_corrupt_hash_returns_false():
+    assert verify_password("anything", "not-a-bcrypt-hash") is False
+
+
 def test_hash_password_different_salts():
     h1 = hash_password("same")
     h2 = hash_password("same")

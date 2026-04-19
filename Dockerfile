@@ -1,5 +1,5 @@
 # =============================================================================
-# Stage 1: dependency builder
+# Stage 1: export locked requirements (uv) + build wheels
 # =============================================================================
 FROM python:3.11-slim AS builder
 
@@ -9,9 +9,15 @@ WORKDIR /build
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     libpq-dev \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt .
+# uv — export frozen requirements from uv.lock (pin image tag in production CI)
+COPY --from=ghcr.io/astral-sh/uv:0.9.6 /uv /usr/local/bin/uv
+
+COPY pyproject.toml uv.lock ./
+RUN uv export --frozen --no-dev --no-annotate -o requirements.txt
+
 RUN pip install --upgrade pip \
     && pip wheel --no-cache-dir --wheel-dir /build/wheels -r requirements.txt
 
@@ -34,9 +40,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Install pre-built wheels from builder stage
 COPY --from=builder /build/wheels /tmp/wheels
-COPY requirements.txt .
-RUN pip install --no-cache-dir --no-index --find-links /tmp/wheels -r requirements.txt \
-    && rm -rf /tmp/wheels requirements.txt
+COPY --from=builder /build/requirements.txt /tmp/requirements.txt
+RUN pip install --no-cache-dir --no-index --find-links /tmp/wheels -r /tmp/requirements.txt \
+    && rm -rf /tmp/wheels /tmp/requirements.txt
 
 # Copy application source
 COPY backend/ ./backend/

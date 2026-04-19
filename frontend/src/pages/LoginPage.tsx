@@ -4,6 +4,14 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { apiFetch, getApiBaseUrl } from "@/api/client";
 import { useAuthSession } from "@/context/AuthSessionContext";
 
+type ApiErrorBody = { error?: { message?: string } };
+
+function messageFromErrorBody(body: unknown): string | null {
+  if (!body || typeof body !== "object") return null;
+  const msg = (body as ApiErrorBody).error?.message;
+  return typeof msg === "string" && msg.trim() ? msg.trim() : null;
+}
+
 export function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -25,11 +33,41 @@ export function LoginPage() {
         method: "POST",
         body: JSON.stringify({ email, password }),
       });
+      let body: unknown = null;
+      try {
+        body = await res.json();
+      } catch {
+        /* non-JSON body */
+      }
       if (!res.ok) {
-        setError("Invalid credentials or server error.");
+        const apiMsg = messageFromErrorBody(body);
+        if (res.status === 401) {
+          setError(
+            apiMsg ??
+              "Invalid email or password. If you have no account yet, from the repository root run: python -m scripts.bootstrap_dev_user (requires PostgreSQL, migrations, and APP_ENV=development)."
+          );
+        } else if (res.status === 422) {
+          setError(apiMsg ?? "Check that the email is valid and fields are filled.");
+        } else if (res.status === 502 || res.status === 503 || res.status === 504) {
+          setError(
+            apiMsg ??
+              "Cannot reach the API (bad gateway). Start the backend on port 8000 from the repo root, e.g. uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000. The Vite dev server proxies /api to localhost:8000."
+          );
+        } else if (res.status >= 500) {
+          setError(
+            apiMsg ??
+              "Server error — check the API terminal logs, DATABASE_URL, and that alembic upgrade head has been applied."
+          );
+        } else {
+          setError(apiMsg ?? `Sign-in failed (HTTP ${res.status}).`);
+        }
         return;
       }
-      const data = (await res.json()) as { access_token: string };
+      const data = body as { access_token?: string };
+      if (!data?.access_token) {
+        setError("Unexpected response: missing access_token.");
+        return;
+      }
       setJwtSession(data.access_token);
       navigate(from, { replace: true });
     } catch {
@@ -105,7 +143,7 @@ export function LoginPage() {
             className="rounded border border-slate-700 bg-slate-950 px-3 py-2 font-mono text-sm"
             type="password"
             autoComplete="off"
-            placeholder="vo_…"
+            placeholder="vops_…"
             value={apiKey}
             onChange={(e) => setApiKey(e.target.value)}
           />

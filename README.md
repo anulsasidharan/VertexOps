@@ -70,7 +70,7 @@ VertexOps gives ML engineers and DevOps teams a single control plane for the ful
 
 | Layer | Technology |
 |---|---|
-| API & Backend | Python 3.11+, FastAPI, Uvicorn |
+| API & Backend | Python 3.11+, FastAPI, Uvicorn, **uv** (dependency lock + virtualenv) |
 | Database | PostgreSQL 16, SQLAlchemy 2.0 (async), Alembic |
 | Cache & Broker | Redis 7 |
 | Background Workers | Celery |
@@ -92,8 +92,8 @@ VertexOps gives ML engineers and DevOps teams a single control plane for the ful
 | **Phase 2** | DB engine, session management, schema models, JWT + API key auth, RBAC, rate limiting | **Complete** |
 | **Phase 3** | Ingestion and indexing pipeline — storage, Documents API, parsing, chunking, embedding, vector store, index management, Celery workers, and end-to-end async pipeline | **Complete** |
 | **Phase 4** | Retrieval, hybrid search, generation, query API, realtime streaming, citations, and guardrails | **Complete** |
-| Phase 5 | Experiments, evaluation, and optimization | Planned |
-| Phase 6 | Frontend dashboard and product integrations | Planned |
+| **Phase 5** | Experiments, evaluation, MLflow tracking, and LangGraph optimization orchestrator | **Complete** |
+| **Phase 6** | Frontend dashboard, query playground, eval views, SendGrid/Twilio notifications, Stripe billing hooks | **Complete** |
 | Phase 7 | Observability, production containers, CI/CD | Planned |
 | Phase 8 | Final quality sweep and documentation | Planned |
 
@@ -122,8 +122,9 @@ vertexops/
 │   ├── retrieval/               # Retrieval service (vector + hybrid search)
 │   ├── generation/              # Generation service, prompt templates
 │   ├── evaluation/              # Eval dataset service, metric aggregation
-│   ├── experiments/             # Experiment registry and tracking bridges
+│   ├── experiments/             # Experiment registry and MLflow tracking bridges
 │   ├── orchestration/           # LangGraph-backed optimization orchestrator
+│   ├── integrations/            # Optional external adapters (SendGrid, Twilio, Stripe)
 │   └── workers/                 # Celery app and task definitions
 ├── alembic/                     # Database migrations
 │   └── versions/                # Migration scripts (0001_workspaces_and_users, …)
@@ -131,12 +132,11 @@ vertexops/
 │   ├── unit/                    # Unit tests with mocked dependencies
 │   └── integration/             # Integration tests against live services
 ├── docs/                        # Architecture, API spec, DB schema, and deployment docs
-├── frontend/                    # React/Vite dashboard (Phase 6)
+├── frontend/                    # React/Vite dashboard (login, documents, indexes, query playground, evaluations)
 ├── docker-compose.yml           # Local dev: API, PostgreSQL, Redis, Worker
-├── Dockerfile                   # Multi-stage build (builder + runtime)
-├── pyproject.toml               # Build config, pytest, ruff, mypy settings
-├── requirements.txt             # Runtime dependencies
-└── requirements-dev.txt         # Dev/test dependencies
+├── Dockerfile                   # Multi-stage build (uv export + wheels + runtime)
+├── pyproject.toml               # Runtime + dev dependency declarations (PEP 621), tooling config
+└── uv.lock                      # Locked dependency tree (uv); commit with pyproject changes
 ```
 
 ---
@@ -144,6 +144,7 @@ vertexops/
 ## Prerequisites
 
 - Python 3.11+
+- **[uv](https://docs.astral.sh/uv/)** (recommended) — install: `pip install uv` or see [Installing uv](https://docs.astral.sh/uv/getting-started/installation/)
 - Docker and Docker Compose (for local infra)
 - `git`
 
@@ -197,25 +198,43 @@ docker compose --profile worker up -d worker
 Run the API against a local or remote PostgreSQL and Redis instance:
 
 ```bash
-# 1. Create and activate a virtual environment
-python -m venv .venv
-source .venv/bin/activate      # Windows: .venv\Scripts\activate
+# 1. Install dependencies into .venv (runtime + dev/test tools)
+uv sync --all-groups
 
-# 2. Install dependencies
-pip install -r requirements-dev.txt
-
-# 3. Configure environment
+# 2. Configure environment
 cp .env.example .env
 # Edit .env with your DATABASE_URL, REDIS_URL, JWT_SECRET_KEY, API_KEY_PEPPER
 
-# 4. Apply migrations
-alembic upgrade head
+# 3. Apply migrations
+uv run alembic upgrade head
+
+# 4. (Optional) Create a local dev admin for the dashboard JWT login — only when APP_ENV=development
+# Run from this repository root (where alembic.ini lives), not from frontend/
+uv run python -m scripts.bootstrap_dev_user
+# Defaults: admin@localhost / changeme (override with --email / --password)
+# From frontend/: npm run db:migrate   and   npm run db:bootstrap-user -- --email ... --password ...
 
 # 5. Start the API (development mode with auto-reload)
-uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000
+uv run uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
+**Runtime only** (no linters/test tools): `uv sync` (omit `--all-groups`).
+
+**After changing dependencies** in `pyproject.toml`: run `uv lock` and commit the updated `uv.lock`. In CI, `uv lock --check` fails if the lockfile is stale.
+
 API docs are available at [http://localhost:8000/docs](http://localhost:8000/docs) in development mode.
+
+**PostgreSQL not running?** `ConnectionRefusedError` from `alembic` or `bootstrap_dev_user` means nothing is listening on the host/port in `DATABASE_URL`. From the repo root, start the bundled database:
+
+```bash
+docker compose up -d postgres
+```
+
+Set `DATABASE_URL` in `.env` to match that server. For the Compose service in this repository, the host connection string is:
+
+`postgresql+asyncpg://vertexops:vertexops@localhost:5432/vertexops`
+
+(If you use a different local Postgres, keep user/password/db name in the URL in sync with that instance.)
 
 ---
 
@@ -225,19 +244,19 @@ Migrations are managed with Alembic and live in `alembic/versions/`.
 
 ```bash
 # Apply all pending migrations
-alembic upgrade head
+uv run alembic upgrade head
 
 # Roll back one migration
-alembic downgrade -1
+uv run alembic downgrade -1
 
 # Auto-generate a new migration from model changes
-alembic revision --autogenerate -m "describe your change"
+uv run alembic revision --autogenerate -m "describe your change"
 
 # Show current migration state
-alembic current
+uv run alembic current
 
 # Show migration history
-alembic history
+uv run alembic history
 ```
 
 ### Current migrations
@@ -255,16 +274,16 @@ alembic history
 
 ```bash
 # All unit tests
-pytest tests/unit/
+uv run pytest tests/unit/
 
 # All tests (requires running PostgreSQL and Redis for integration tests)
-pytest
+uv run pytest
 
 # With coverage report
-pytest --cov=backend --cov-report=term-missing
+uv run pytest --cov=backend --cov-report=term-missing
 
 # A specific test file
-pytest tests/unit/test_db.py -v
+uv run pytest tests/unit/test_db.py -v
 ```
 
 The test suite uses `pytest-asyncio` in auto mode. Required environment variables are set automatically in `tests/conftest.py` — no `.env` file is needed for unit tests.
@@ -312,17 +331,24 @@ All routes are served under `/api/v1`.
 | `GET` | `/api/v1/documents` | List documents in the workspace (paginated) |
 | `GET` | `/api/v1/documents/{id}` | Retrieve a single document |
 | `DELETE` | `/api/v1/documents/{id}` | Delete a document and its storage object |
+| `POST` | `/api/v1/indexes` | Create a vector index |
+| `GET` | `/api/v1/indexes` | List indexes |
+| `GET` | `/api/v1/indexes/{id}` | Retrieve index details |
+| `POST` | `/api/v1/indexes/{id}/rebuild` | Trigger index rebuild |
+| `POST` | `/api/v1/query` | RAG query with source citations and latency |
+| `POST` | `/api/v1/experiments` | Create an experiment |
+| `GET` | `/api/v1/experiments` | List experiments |
+| `GET` | `/api/v1/experiments/{id}` | Retrieve experiment details |
+| `POST` | `/api/v1/experiments/{id}/run` | Kick off an experiment run |
+| `POST` | `/api/v1/evaluations` | Start an evaluation job |
+| `GET` | `/api/v1/evaluations/{id}` | Retrieve evaluation status |
+| `GET` | `/api/v1/evaluations/{id}/report` | Download evaluation report artifact |
 
 ### Planned endpoints (see `docs/API_SPEC.md`)
 
 | Group | Prefix | Description |
 |---|---|---|
-| Indexes | `/indexes` | Create and manage vector indexes |
-| Query | `/query` | RAG query with source citations |
-| Experiments | `/experiments` | CRUD and run kickoff |
-| Evaluations | `/evaluations` | Evaluation jobs and reports |
-| Auth | `/auth` | JWT and API key management |
-| Metrics | `/metrics` | Prometheus metrics (internal) |
+| Metrics | `/metrics` | Prometheus metrics endpoint (Phase 7) |
 
 Error responses follow a consistent envelope:
 

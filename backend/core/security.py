@@ -7,12 +7,16 @@ import uuid
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, Optional
 
+import bcrypt
 import jwt
-from passlib.context import CryptContext
 
 from backend.core.exceptions import UnauthorizedError
 
-_pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def _password_bytes(password: str) -> bytes:
+    """Bcrypt ignores input past 72 bytes; truncate so hashing never raises on long secrets."""
+    raw = password.encode("utf-8")
+    return raw[:72] if len(raw) > 72 else raw
 
 _API_KEY_PREFIX = "vops_"
 _API_KEY_BYTES = 32
@@ -24,11 +28,17 @@ _API_KEY_BYTES = 32
 
 
 def hash_password(password: str) -> str:
-    return _pwd_context.hash(password)
+    """Return a bcrypt hash string (compatible with prior passlib-stored hashes)."""
+    digest = bcrypt.hashpw(_password_bytes(password), bcrypt.gensalt())
+    return digest.decode("ascii")
 
 
 def verify_password(plain: str, hashed: str) -> bool:
-    return _pwd_context.verify(plain, hashed)
+    """Return False on mismatch or unrecognised / corrupt stored hash (never raises)."""
+    try:
+        return bcrypt.checkpw(_password_bytes(plain), hashed.encode("ascii"))
+    except (ValueError, TypeError):
+        return False
 
 
 # ---------------------------------------------------------------------------
