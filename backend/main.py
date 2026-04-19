@@ -18,6 +18,7 @@ from backend.core.middleware import (
     request_validation_exception_handler,
     unhandled_exception_handler,
 )
+from backend.core.telemetry import initialise_app_info, setup_otel
 
 
 @asynccontextmanager
@@ -25,6 +26,11 @@ async def lifespan(app: FastAPI):
     """Application lifespan: startup and shutdown hooks."""
     settings = get_settings()
     configure_logging(settings.log_level)
+    initialise_app_info(version=settings.app_version, env=settings.app_env)
+    setup_otel(
+        service_name=settings.app_name,
+        endpoint=settings.otel_exporter_otlp_endpoint,
+    )
     await init_engine()
     yield
     await dispose_engine()
