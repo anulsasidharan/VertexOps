@@ -262,3 +262,8 @@ bootstrap_dev_user output: (trapped) error reading bcrypt version / AttributeErr
 [Prompt:]
 use uv package manager to manage the dependencies
 ---
+### 2026-04-20 23:45 UTC
+[Timestamp: 2026-04-20T23:45:00Z]
+[Prompt:]
+Create all the possible interview questions and answers for this project and place in the docs folder as a .md file
+---
