@@ -2,7 +2,18 @@
   "permissions": {
     "allow": [
       "Bash(pip install *)",
-      "Bash(python -c \"from backend.main import app; print\\('App boots OK —', app.title\\)\")"
+      "Bash(python -c \"from backend.main import app; print\\('App boots OK —', app.title\\)\")",
+      "Bash(uv run *)",
+      "Bash(curl -s -X POST http://localhost:8000/api/v1/auth/register -H \"Content-Type: application/json\" -d '{\"email\":\"test@test.com\",\"password\":\"password123\"}')",
+      "Bash(curl *)",
+      "Bash(python3 -c \"import sys; data=sys.stdin.read\\(\\); print\\('register' in data, 'auth' in data\\)\")",
+      "Bash(npx tsc *)",
+      "Bash(pkill -f \"uvicorn backend.main:app\")",
+      "Bash(python3 -c \"import sys,json; data=json.load\\(sys.stdin\\); [print\\(p\\) for p in data.get\\('paths',{}\\).keys\\(\\) if 'auth' in p]\")",
+      "Bash(netstat -ano)",
+      "Bash(taskkill /PID 35944 /F)",
+      "Bash(cmd *)",
+      "Bash(wmic process *)"
     ]
   }
 }

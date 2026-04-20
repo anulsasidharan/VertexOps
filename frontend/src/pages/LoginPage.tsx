@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { apiFetch, getApiBaseUrl } from "@/api/client";
 import { useAuthSession } from "@/context/AuthSessionContext";
@@ -44,14 +44,14 @@ export function LoginPage() {
         if (res.status === 401) {
           setError(
             apiMsg ??
-              "Invalid email or password. If you have no account yet, from the repository root run: python -m scripts.bootstrap_dev_user (requires PostgreSQL, migrations, and APP_ENV=development)."
+              "Invalid email or password. Create an account from the sign-up page, or ask an operator to run bootstrap_dev_user for a local admin (see README)."
           );
         } else if (res.status === 422) {
           setError(apiMsg ?? "Check that the email is valid and fields are filled.");
         } else if (res.status === 502 || res.status === 503 || res.status === 504) {
           setError(
             apiMsg ??
-              "Cannot reach the API (bad gateway). Start the backend on port 8000 from the repo root, e.g. uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000. The Vite dev server proxies /api to localhost:8000."
+              "Cannot reach the API (bad gateway). Start the FastAPI server on port 8000 in a second terminal — from the repo root: uv run uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000, or from the frontend folder: npm run start:api. With Docker: docker compose up -d. Ensure PostgreSQL is running and migrations are applied (npm run db:migrate). The Vite dev server proxies /api to 127.0.0.1:8000."
           );
         } else if (res.status >= 500) {
           setError(
@@ -71,7 +71,9 @@ export function LoginPage() {
       setJwtSession(data.access_token);
       navigate(from, { replace: true });
     } catch {
-      setError("Could not reach API. Is the backend running?");
+      setError(
+        "Could not reach the API. Start it on port 8000 (uv run uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000 from the repo root, or npm run start:api from frontend/)."
+      );
     } finally {
       setLoading(false);
     }
@@ -189,6 +191,13 @@ export function LoginPage() {
           </button>
         </form>
       </section>
+
+        <p className="text-center text-sm text-slate-400">
+          New to VertexOps?{" "}
+          <Link to="/register" className="text-indigo-400 hover:text-indigo-300 font-medium">
+            Create an account
+          </Link>
+        </p>
 
         <p className="text-center text-xs text-slate-600">
           API:{" "}

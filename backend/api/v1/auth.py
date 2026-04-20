@@ -1,25 +1,37 @@
-"""Auth endpoints — JWT token issuance and API key management."""
+"""Auth endpoints — JWT token issuance, registration, and API key management."""
 
 import uuid
 from typing import Annotated, Optional
 
-from fastapi import APIRouter, Depends
-from pydantic import BaseModel, EmailStr
+from fastapi import APIRouter, Depends, status
+from pydantic import BaseModel, EmailStr, Field
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.api.dependencies.auth import AuthContext, get_current_user
+from backend.api.dependencies.rate_limit import rate_limit
 from backend.core.config import get_settings
 from backend.core.db import get_db
-from backend.core.exceptions import NotFoundError, UnauthorizedError
+from backend.core.exceptions import (
+    ConflictError,
+    ForbiddenError,
+    NotFoundError,
+    UnauthorizedError,
+)
+from backend.core.rate_limit import STRICT_POLICY
 from backend.core.security import (
     create_access_token,
     generate_api_key,
     hash_api_key,
+    hash_password,
     verify_password,
 )
 from backend.models.api_key import APIKey
+from backend.models.user import User
+from backend.models.workspace import Workspace
 from backend.repositories.api_key_repository import APIKeyRepository
 from backend.repositories.user_repository import UserRepository
+from backend.repositories.workspace_repository import WorkspaceRepository
 
 router = APIRouter()
 
@@ -32,6 +44,11 @@ router = APIRouter()
 class TokenRequest(BaseModel):
     email: EmailStr
     password: str
+
+
+class RegisterRequest(BaseModel):
+    email: EmailStr
+    password: Annotated[str, Field(min_length=8, max_length=128)]
 
 
 class TokenResponse(BaseModel):
@@ -59,7 +76,59 @@ class APIKeyListItem(BaseModel):
 # ---------------------------------------------------------------------------
 
 
-@router.post("/token", response_model=TokenResponse, summary="Issue JWT access token")
+@router.post(
+    "/register",
+    response_model=TokenResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create a new account (email + password)",
+    dependencies=[Depends(rate_limit(STRICT_POLICY, key_prefix="auth_register"))],
+)
+async def register(
+    body: RegisterRequest,
+    db: AsyncSession = Depends(get_db),
+) -> TokenResponse:
+    """Create a workspace, member user, and return a JWT (same shape as ``/auth/token``)."""
+    settings = get_settings()
+    if not settings.allow_public_signup:
+        raise ForbiddenError("Public sign-up is disabled.")
+
+    urepo = UserRepository(db)
+    if await urepo.get_by_email(str(body.email)) is not None:
+        raise ConflictError("An account with this email already exists.")
+
+    ws_repo = WorkspaceRepository(db)
+    ws_name = str(body.email)[:255]
+    ws = Workspace(name=ws_name)
+    await ws_repo.add(ws)
+
+    user = User(
+        email=str(body.email),
+        password_hash=hash_password(body.password),
+        role="member",
+        workspace_id=ws.id,
+    )
+    try:
+        await urepo.add(user)
+    except IntegrityError as exc:
+        raise ConflictError("An account with this email already exists.") from exc
+
+    token = create_access_token(
+        subject=str(user.id),
+        role=user.role,
+        workspace_id=user.workspace_id,
+        secret_key=settings.jwt_secret_key.get_secret_value(),
+        algorithm=settings.jwt_algorithm,
+        expires_minutes=settings.jwt_access_token_expire_minutes,
+    )
+    return TokenResponse(access_token=token)
+
+
+@router.post(
+    "/token",
+    response_model=TokenResponse,
+    summary="Issue JWT access token",
+    dependencies=[Depends(rate_limit(STRICT_POLICY, key_prefix="auth_token"))],
+)
 async def issue_token(
     body: TokenRequest,
     db: AsyncSession = Depends(get_db),

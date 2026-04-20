@@ -158,38 +158,43 @@ Optional (for cloud features):
 
 ## Quick Start — Docker
 
-The fastest way to run the full stack locally:
+The fastest way to run the complete stack (API + frontend + database + cache):
 
 ```bash
 # 1. Clone the repository
 git clone https://github.com/your-org/vertexops.git
 cd vertexops
 
-# 2. Copy the environment template
-cp .env.example .env
-# Edit .env — at minimum set JWT_SECRET_KEY and API_KEY_PEPPER
+# 2. Build and start all services (postgres, redis, api, frontend)
+docker compose up -d --build
 
-# 3. Start backing services (PostgreSQL + Redis)
-docker compose up -d postgres redis
-
-# 4. Run database migrations
+# 3. Run database migrations (first time only)
 docker compose run --rm api alembic upgrade head
 
-# 5. Start the API
-docker compose up -d api
-
-# 6. Verify it's running
-curl http://localhost:8000/api/v1/health
-# → {"status":"ok"}
-
-curl http://localhost:8000/api/v1/ready
-# → {"status":"ok","checks":{"database":"ok"}}
+# 4. Open the app
+# Frontend (React dashboard):  http://localhost
+# API docs:                     http://localhost:8000/docs
+# Health check:                 http://localhost:8000/api/v1/health
 ```
+
+Services started by default:
+| Service | URL | Description |
+|---------|-----|-------------|
+| `frontend` | http://localhost | React SPA (Nginx, proxies `/api` → backend) |
+| `api` | http://localhost:8000 | FastAPI backend |
+| `postgres` | localhost:5432 | PostgreSQL 16 |
+| `redis` | localhost:6379 | Redis 7 |
 
 To also start the background worker:
 
 ```bash
 docker compose --profile worker up -d worker
+```
+
+To rebuild after code changes:
+
+```bash
+docker compose up -d --build
 ```
 
 ---

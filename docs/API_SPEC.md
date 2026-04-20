@@ -61,6 +61,7 @@ If wrapping is used, skip double-wrapping when the handler already returns `data
 
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
+| POST | `/auth/register` | No | Create user (email + password); returns JWT **201** when `ALLOW_PUBLIC_SIGNUP` is enabled |
 | POST | `/auth/token` | No | Issue JWT access token (email + password) |
 | POST | `/auth/api-keys` | Yes | Create API key for the authenticated user |
 | GET | `/auth/api-keys` | Yes | List API keys for the authenticated user |

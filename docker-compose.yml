@@ -1,7 +1,8 @@
 # VertexOps — local development infrastructure
 #
 # Usage:
-#   docker compose up -d                    # start API + backing services
+#   docker compose up -d --build            # start complete stack (frontend + api + postgres + redis)
+#   docker compose run --rm api alembic upgrade head  # run migrations (first time)
 #   docker compose up -d postgres redis     # backing services only
 #   docker compose --profile worker up -d worker
 #   docker compose logs -f api              # follow API logs
@@ -32,7 +33,14 @@ x-app-env: &app-env
   # Development placeholders — override with real secrets in staging/prod
   JWT_SECRET_KEY: dev-jwt-secret-change-in-production
   API_KEY_PEPPER: dev-api-key-pepper-change-in-production
-  CORS_ORIGINS: "http://localhost:3000,http://localhost:5173"
+  ALLOW_PUBLIC_SIGNUP: "true"
+  CORS_ORIGINS: '["http://localhost:3000","http://localhost:5173","http://localhost"]'
+  # LLM providers — read from .env file (never hardcode secrets here)
+  OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+  # Vector store — read from .env file
+  PINECONE_API_KEY: ${PINECONE_API_KEY:-}
+  PINECONE_INDEX_NAME: ${PINECONE_INDEX_NAME:-vertexops-index}
+  PINECONE_ENVIRONMENT: ${PINECONE_ENVIRONMENT:-}
 
 services:
 
@@ -109,6 +117,25 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
+    networks:
+      - vertexops_net
+
+  # ---------------------------------------------------------------------------
+  # Frontend — React SPA served by Nginx; proxies /api → api:8000
+  # ---------------------------------------------------------------------------
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: frontend
+    image: vertexops-frontend:latest
+    container_name: vertexops_frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      api:
+        condition: service_healthy
     networks:
       - vertexops_net
 
