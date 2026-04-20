@@ -90,20 +90,54 @@ export function LoginPage() {
   }
 
   return (
-    <div className="mx-auto flex max-w-lg flex-col gap-8 px-4 py-16">
-      <header>
-        <h1 className="text-2xl font-semibold">VertexOps</h1>
-        <p className="mt-1 text-sm text-slate-400">
-          Sign in with email and password (JWT) or paste an API key. API base:{" "}
-          <code className="rounded bg-slate-800 px-1">{getApiBaseUrl()}</code>
-        </p>
-      </header>
+    <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
+      <div className="w-full max-w-md space-y-6">
+        <header className="text-center">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-indigo-600/20 border border-indigo-600/40 mb-4">
+            <span className="text-2xl">⚡</span>
+          </div>
+          <h1 className="text-2xl font-bold text-slate-100">Welcome to VertexOps</h1>
+          <p className="mt-1 text-sm text-slate-400">
+            Multi-cloud AI infrastructure platform
+          </p>
+        </header>
 
-      {error ? (
-        <div className="rounded border border-red-900/60 bg-red-950/40 px-3 py-2 text-sm text-red-200">
-          {error}
+        {error ? (
+          <div className="rounded-lg border border-red-900/60 bg-red-950/40 px-4 py-3 text-sm text-red-200">
+            {error}
+          </div>
+        ) : null}
+
+        {/* SSO buttons */}
+        <div className="space-y-2">
+          <button
+            type="button"
+            onClick={() => setError("SSO requires enterprise plan — use email/password below.")}
+            className="w-full flex items-center justify-center gap-3 rounded-lg border border-slate-700 bg-slate-900 px-4 py-2.5 text-sm font-medium text-slate-300 hover:bg-slate-800 transition-colors"
+          >
+            <span className="text-lg">🔵</span> Continue with Google
+          </button>
+          <button
+            type="button"
+            onClick={() => setError("SSO requires enterprise plan — use email/password below.")}
+            className="w-full flex items-center justify-center gap-3 rounded-lg border border-slate-700 bg-slate-900 px-4 py-2.5 text-sm font-medium text-slate-300 hover:bg-slate-800 transition-colors"
+          >
+            <span className="text-lg">🔷</span> Continue with Okta
+          </button>
+          <button
+            type="button"
+            onClick={() => setError("SSO requires enterprise plan — use email/password below.")}
+            className="w-full flex items-center justify-center gap-3 rounded-lg border border-slate-700 bg-slate-900 px-4 py-2.5 text-sm font-medium text-slate-300 hover:bg-slate-800 transition-colors"
+          >
+            <span className="text-lg">🪟</span> Continue with Azure AD
+          </button>
         </div>
-      ) : null}
+
+        <div className="flex items-center gap-3">
+          <div className="flex-1 h-px bg-slate-800" />
+          <span className="text-xs text-slate-600 font-medium uppercase tracking-wider">or</span>
+          <div className="flex-1 h-px bg-slate-800" />
+        </div>
 
       <section className="rounded-lg border border-slate-800 bg-slate-900/50 p-4">
         <h2 className="mb-3 text-sm font-medium text-slate-300">JWT (email / password)</h2>
@@ -155,6 +189,12 @@ export function LoginPage() {
           </button>
         </form>
       </section>
+
+        <p className="text-center text-xs text-slate-600">
+          API:{" "}
+          <code className="rounded bg-slate-800 px-1 text-slate-500">{getApiBaseUrl()}</code>
+        </p>
+      </div>
     </div>
   );
 }
