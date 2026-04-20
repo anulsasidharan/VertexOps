@@ -1,6 +1,8 @@
 "use client";
+import { useState } from "react";
 import { ArrowRight, Play, CheckCircle2, TrendingDown, Clock, Cpu } from "lucide-react";
 import { AnimatedCounter } from "../ui/AnimatedCounter";
+import { DemoModal } from "../ui/DemoModal";
 
 const STATS = [
   { value: 67, suffix: "%", label: "MTTR Reduction", icon: Clock },
@@ -15,7 +17,10 @@ const TRUST_ITEMS = [
 ];
 
 export function HeroSection() {
+  const [demoOpen, setDemoOpen] = useState(false);
+
   return (
+    <>
     <section className="relative min-h-screen flex items-center pt-16 overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-primary-50/60 via-white to-white" />
@@ -58,7 +63,10 @@ export function HeroSection() {
                 Request Demo
                 <ArrowRight className="w-4 h-4" />
               </a>
-              <button className="btn-secondary px-7 py-3.5 text-base rounded-xl group">
+              <button
+                onClick={() => setDemoOpen(true)}
+                className="btn-secondary px-7 py-3.5 text-base rounded-xl group"
+              >
                 <div className="w-7 h-7 rounded-full bg-primary-100 flex items-center justify-center group-hover:bg-primary-200 transition-colors">
                   <Play className="w-3 h-3 text-primary-600 fill-primary-600" />
                 </div>
@@ -204,5 +212,8 @@ export function HeroSection() {
         </div>
       </div>
     </section>
+
+    {demoOpen && <DemoModal onClose={() => setDemoOpen(false)} />}
+    </>
   );
 }
