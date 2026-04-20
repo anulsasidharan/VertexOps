@@ -10,24 +10,33 @@ import {
 function Counter({ to, prefix = "", suffix = "" }: { to: number; prefix?: string; suffix?: string }) {
   const [val, setVal] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
+  const rafRef = useRef<number>(0);
+
   useEffect(() => {
+    let active = true;
     const obs = new IntersectionObserver(([e]) => {
       if (!e.isIntersecting) return;
       obs.disconnect();
       const start = performance.now();
       const dur = 1200;
       const step = (now: number) => {
+        if (!active) return;
         const p = Math.min(1, (now - start) / dur);
         const ease = 1 - Math.pow(1 - p, 3);
         setVal(Math.floor(ease * to));
-        if (p < 1) requestAnimationFrame(step);
+        if (p < 1) { rafRef.current = requestAnimationFrame(step); }
         else setVal(to);
       };
-      requestAnimationFrame(step);
+      rafRef.current = requestAnimationFrame(step);
     });
     if (ref.current) obs.observe(ref.current);
-    return () => obs.disconnect();
+    return () => {
+      active = false;
+      obs.disconnect();
+      cancelAnimationFrame(rafRef.current);
+    };
   }, [to]);
+
   return (
     <span ref={ref}>
       {prefix}{val.toLocaleString()}{suffix}
@@ -171,7 +180,7 @@ export function DashboardPage() {
           <h2 className="text-sm font-semibold text-slate-300 mb-3">Live Activity</h2>
           <div className="space-y-2.5">
             {feed.map((item) => (
-              <div key={item.id} className="flex items-start gap-2.5 text-xs animate-[fade_0.3s_ease]">
+              <div key={item.id} className="flex items-start gap-2.5 text-xs">
                 <div className={`w-2 h-2 rounded-full mt-1 flex-shrink-0 ${ACTIVITY_COLORS[item.type] ?? "bg-slate-500"}`} />
                 <div className="min-w-0">
                   <div className="text-slate-300 leading-snug">{item.message}</div>
