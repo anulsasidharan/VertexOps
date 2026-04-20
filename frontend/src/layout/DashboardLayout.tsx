@@ -12,9 +12,9 @@ export function DashboardLayout() {
 
   return (
     <div className="flex min-h-screen flex-col md:flex-row">
-      <aside className="border-b border-slate-800 md:w-56 md:border-b-0 md:border-r md:p-4">
+      <aside className="border-b border-slate-800 md:w-56 md:border-b-0 md:border-r md:p-4 md:flex md:flex-col">
         <div className="mb-6 px-2 text-lg font-semibold tracking-tight">VertexOps</div>
-        <nav className="flex flex-wrap gap-1 md:flex-col">
+        <nav className="flex flex-wrap gap-1 md:flex-col md:flex-1">
           <NavLink to="/" end className={linkClass}>
             Home
           </NavLink>
@@ -27,8 +27,14 @@ export function DashboardLayout() {
           <NavLink to="/query" className={linkClass}>
             Query
           </NavLink>
+          <NavLink to="/experiments" className={linkClass}>
+            Experiments
+          </NavLink>
           <NavLink to="/evaluations" className={linkClass}>
             Evaluations
+          </NavLink>
+          <NavLink to="/settings" className={linkClass}>
+            Settings
           </NavLink>
         </nav>
         <button
