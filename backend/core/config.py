@@ -47,6 +47,8 @@ class Settings(BaseSettings):
     jwt_access_token_expire_minutes: int = 60
     jwt_refresh_token_expire_days: int = 7
     api_key_pepper: SecretStr
+    #: When False, ``POST /api/v1/auth/register`` returns 403 (invite-only / operator-managed users).
+    allow_public_signup: bool = True
 
     # -------------------------------------------------------------------------
     # LLM providers

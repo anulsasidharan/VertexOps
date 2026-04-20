@@ -1,3 +1,39 @@
+### 2026-04-20 22:30 UTC
+[Timestamp: 2026-04-20T22:30:00Z]
+[Prompt:]
+create a full proof document about the project. It should contain the detailed steps how can a user can use this platform for their company. how to integrate their cloud platform into this application and start VertexOps integration and monitoring.  Create a full proof document. It should be easy to understand and follow. Include required diagram in respective places. No code changes. place it in the docs folder as a user-runbook file.
+---
+
+### 2026-04-20 20:00 UTC
+[Timestamp: 2026-04-20T20:00:00Z]
+[Prompt:]
+Registration endpoint not found. Restart the API (uvicorn) so it loads the latest code, open /docs and confirm POST /api/v1/auth/register. If you use VITE_API_BASE_URL, use a bare origin (e.g. http://127.0.0.1:8000) or end with /api/v1, then restart npm run dev.
+---
+
+### 2026-04-20 18:00 UTC
+[Timestamp: 2026-04-20T18:00:00Z]
+[Prompt:]
+Registration failed (HTTP 404).
+---
+
+### 2026-04-20 12:00 UTC
+[Timestamp: 2026-04-20T12:00:00Z]
+[Prompt:]
+Why there is not user sign up available? I need new user signup using email id
+---
+
+### 2026-04-19 14:00 UTC
+[Timestamp: 2026-04-19T14:00:00Z]
+[Prompt:]
+Cannot reach the API (bad gateway). Start the backend on port 8000 from the repo root, e.g. uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000. The Vite dev server proxies /api to localhost:8000. Getting this error while clicking on login
+---
+
+### 2026-04-19 12:00 UTC
+[Timestamp: 2026-04-19T12:00:00Z]
+[Prompt:]
+login from the landing page is not working.
+---
+
 ### 2026-04-18 12:00 UTC
 [Timestamp: 2026-04-18T12:00:00Z]
 [Prompt:]

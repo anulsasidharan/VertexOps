@@ -1,9 +1,10 @@
-"""Integration tests for the Auth API endpoints (JWT login, API key management)."""
+"""Integration tests for the Auth API endpoints (JWT login, registration, API keys)."""
 
 import uuid
 from unittest.mock import AsyncMock, MagicMock, patch
 
 from fastapi.testclient import TestClient
+from sqlalchemy.exc import IntegrityError
 
 from backend.api.dependencies.auth import AuthContext, get_current_user
 from backend.core.security import hash_api_key, hash_password
@@ -109,6 +110,118 @@ class TestJwtLogin:
         with TestClient(app) as client:
             resp = client.post("/api/v1/auth/token", json={"email": "test@example.com"})
         assert resp.status_code == 422
+
+
+# ---------------------------------------------------------------------------
+# POST /auth/register — email signup
+# ---------------------------------------------------------------------------
+
+
+class TestRegister:
+    def test_register_success_returns_201_and_token(self):
+        ws_id = uuid.uuid4()
+        user_id = uuid.uuid4()
+
+        async def add_ws(ws):
+            ws.id = ws_id
+
+        async def add_user(user):
+            user.id = user_id
+            user.role = "member"
+            user.workspace_id = ws_id
+
+        with (
+            patch("backend.api.v1.auth.UserRepository") as MockUser,
+            patch("backend.api.v1.auth.WorkspaceRepository") as MockWs,
+            patch("backend.api.v1.auth.get_settings") as mock_settings,
+        ):
+            MockUser.return_value.get_by_email = AsyncMock(return_value=None)
+            MockUser.return_value.add = AsyncMock(side_effect=add_user)
+            MockWs.return_value.add = AsyncMock(side_effect=add_ws)
+            mock_settings.return_value.allow_public_signup = True
+            mock_settings.return_value.jwt_secret_key.get_secret_value.return_value = (
+                "test-jwt-secret-key-for-unit-tests-only"
+            )
+            mock_settings.return_value.jwt_algorithm = "HS256"
+            mock_settings.return_value.jwt_access_token_expire_minutes = 60
+
+            with TestClient(app) as client:
+                resp = client.post(
+                    "/api/v1/auth/register",
+                    json={"email": "newuser@example.com", "password": "longenough"},
+                )
+
+        assert resp.status_code == 201
+        body = resp.json()
+        assert body.get("token_type") == "bearer"
+        assert "access_token" in body
+
+    def test_register_duplicate_email_returns_409(self):
+        existing = MagicMock()
+        with (
+            patch("backend.api.v1.auth.UserRepository") as MockUser,
+            patch("backend.api.v1.auth.get_settings") as mock_settings,
+        ):
+            MockUser.return_value.get_by_email = AsyncMock(return_value=existing)
+            mock_settings.return_value.allow_public_signup = True
+
+            with TestClient(app) as client:
+                resp = client.post(
+                    "/api/v1/auth/register",
+                    json={"email": "taken@example.com", "password": "longenough"},
+                )
+
+        assert resp.status_code == 409
+
+    def test_register_disabled_returns_403(self):
+        with patch("backend.api.v1.auth.get_settings") as mock_settings:
+            mock_settings.return_value.allow_public_signup = False
+
+            with TestClient(app) as client:
+                resp = client.post(
+                    "/api/v1/auth/register",
+                    json={"email": "x@example.com", "password": "longenough"},
+                )
+
+        assert resp.status_code == 403
+
+    def test_register_short_password_returns_422(self):
+        with patch("backend.api.v1.auth.get_settings") as mock_settings:
+            mock_settings.return_value.allow_public_signup = True
+
+            with TestClient(app) as client:
+                resp = client.post(
+                    "/api/v1/auth/register",
+                    json={"email": "x@example.com", "password": "short"},
+                )
+
+        assert resp.status_code == 422
+
+    def test_register_integrity_error_returns_409(self):
+        ws_id = uuid.uuid4()
+
+        async def add_ws(ws):
+            ws.id = ws_id
+
+        with (
+            patch("backend.api.v1.auth.UserRepository") as MockUser,
+            patch("backend.api.v1.auth.WorkspaceRepository") as MockWs,
+            patch("backend.api.v1.auth.get_settings") as mock_settings,
+        ):
+            MockUser.return_value.get_by_email = AsyncMock(return_value=None)
+            MockUser.return_value.add = AsyncMock(
+                side_effect=IntegrityError("statement", "params", Exception())
+            )
+            MockWs.return_value.add = AsyncMock(side_effect=add_ws)
+            mock_settings.return_value.allow_public_signup = True
+
+            with TestClient(app) as client:
+                resp = client.post(
+                    "/api/v1/auth/register",
+                    json={"email": "race@example.com", "password": "longenough"},
+                )
+
+        assert resp.status_code == 409
 
 
 # ---------------------------------------------------------------------------

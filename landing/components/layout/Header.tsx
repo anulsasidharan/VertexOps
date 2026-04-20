@@ -2,6 +2,8 @@
 import { useState, useEffect } from "react";
 import { Menu, X, Zap } from "lucide-react";
 
+import { getDashboardLoginUrl, getDashboardRegisterUrl } from "@/lib/dashboardUrl";
+
 const NAV_LINKS = [
   { label: "Product", href: "#features" },
   { label: "How It Works", href: "#how-it-works" },
@@ -13,6 +15,8 @@ const NAV_LINKS = [
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const loginHref = getDashboardLoginUrl();
+  const registerHref = getDashboardRegisterUrl();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -59,10 +63,16 @@ export function Header() {
         {/* CTA buttons */}
         <div className="hidden md:flex items-center gap-3">
           <a
-            href="#"
+            href={loginHref}
             className="text-sm font-medium text-gray-600 hover:text-primary-500 transition-colors px-3 py-2"
           >
             Log in
+          </a>
+          <a
+            href={registerHref}
+            className="text-sm font-medium text-gray-600 hover:text-primary-500 transition-colors px-3 py-2"
+          >
+            Sign up
           </a>
           <a href="#pricing" className="btn-primary text-sm px-4 py-2 rounded-lg">
             Get Started
@@ -93,8 +103,11 @@ export function Header() {
             </a>
           ))}
           <div className="pt-3 border-t border-gray-100 flex flex-col gap-2">
-            <a href="#" className="btn-secondary text-sm py-2.5 rounded-lg justify-center">
+            <a href={loginHref} className="btn-secondary text-sm py-2.5 rounded-lg justify-center">
               Log in
+            </a>
+            <a href={registerHref} className="btn-secondary text-sm py-2.5 rounded-lg justify-center">
+              Sign up
             </a>
             <a href="#pricing" className="btn-primary text-sm py-2.5 rounded-lg justify-center">
               Get Started Free

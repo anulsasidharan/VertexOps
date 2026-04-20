@@ -49,8 +49,9 @@ docs/
 *.md
 !README.md
 
-# Frontend (separate image if needed)
-frontend/
+# Frontend build artefacts — source files are included for the frontend Docker stage
+frontend/node_modules/
+frontend/dist/
 node_modules/
 
 # Terraform / k8s / deploy configs

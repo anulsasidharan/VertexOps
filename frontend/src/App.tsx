@@ -17,6 +17,7 @@ import { IndexesPage } from "@/pages/IndexesPage";
 import { InfrastructurePage } from "@/pages/InfrastructurePage";
 import { IntegrationsPage } from "@/pages/IntegrationsPage";
 import { LoginPage } from "@/pages/LoginPage";
+import { RegisterPage } from "@/pages/RegisterPage";
 import { NotificationsPage } from "@/pages/NotificationsPage";
 import { QueryPlaygroundPage } from "@/pages/QueryPlaygroundPage";
 import { SettingsPage } from "@/pages/SettingsPage";
@@ -27,6 +28,7 @@ export function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
           <Route element={<ProtectedRoute />}>
             <Route element={<DashboardLayout />}>
               {/* Legacy home → redirect to dashboard */}
