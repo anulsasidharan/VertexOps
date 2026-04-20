@@ -10,6 +10,8 @@ type Props = {
   error: string | null;
   statusFilter: string;
   onStatusFilterChange: (v: string) => void;
+  deletingId?: string | null;
+  onDelete?: (id: string) => void;
 };
 
 export function DocumentsTableView({
@@ -18,6 +20,8 @@ export function DocumentsTableView({
   error,
   statusFilter,
   onStatusFilterChange,
+  deletingId,
+  onDelete,
 }: Props) {
   if (state === "loading") {
     return <p className="text-slate-400">Loading documents…</p>;
@@ -71,15 +75,37 @@ export function DocumentsTableView({
             {items.map((d) => (
               <tr key={d.id} className="border-t border-slate-800">
                 <td className="px-3 py-2">{d.title ?? d.id}</td>
-                <td className="px-3 py-2 font-mono text-xs">{d.ingest_status}</td>
+                <td className="px-3 py-2">
+                  <span className={`inline-block rounded px-1.5 py-0.5 font-mono text-xs ${
+                    d.ingest_status === "ready"
+                      ? "bg-green-900/50 text-green-300"
+                      : d.ingest_status === "failed"
+                      ? "bg-red-900/50 text-red-300"
+                      : "bg-slate-800 text-slate-400"
+                  }`}>
+                    {d.ingest_status}
+                  </span>
+                </td>
                 <td className="px-3 py-2">{d.format ?? "—"}</td>
                 <td className="px-3 py-2 text-slate-400">
                   {new Date(d.updated_at).toLocaleString()}
                 </td>
                 <td className="px-3 py-2">
-                  <Link className="text-indigo-400 hover:underline" to={`/documents/${d.id}`}>
-                    View
-                  </Link>
+                  <div className="flex items-center gap-3">
+                    <Link className="text-indigo-400 hover:underline text-xs" to={`/documents/${d.id}`}>
+                      View
+                    </Link>
+                    {onDelete && (
+                      <button
+                        type="button"
+                        disabled={deletingId === d.id}
+                        onClick={() => onDelete(d.id)}
+                        className="text-xs text-red-400 hover:underline disabled:opacity-40"
+                      >
+                        {deletingId === d.id ? "Deleting…" : "Delete"}
+                      </button>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}

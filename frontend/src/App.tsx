@@ -6,10 +6,12 @@ import { DashboardLayout } from "@/layout/DashboardLayout";
 import { DocumentDetailPage } from "@/pages/DocumentDetailPage";
 import { DocumentsPage } from "@/pages/DocumentsPage";
 import { EvaluationsPage } from "@/pages/EvaluationsPage";
+import { ExperimentsPage } from "@/pages/ExperimentsPage";
 import { HomePage } from "@/pages/HomePage";
 import { IndexesPage } from "@/pages/IndexesPage";
 import { LoginPage } from "@/pages/LoginPage";
 import { QueryPlaygroundPage } from "@/pages/QueryPlaygroundPage";
+import { SettingsPage } from "@/pages/SettingsPage";
 
 export function App() {
   return (
@@ -24,7 +26,9 @@ export function App() {
               <Route path="/documents/:documentId" element={<DocumentDetailPage />} />
               <Route path="/indexes" element={<IndexesPage />} />
               <Route path="/query" element={<QueryPlaygroundPage />} />
+              <Route path="/experiments" element={<ExperimentsPage />} />
               <Route path="/evaluations" element={<EvaluationsPage />} />
+              <Route path="/settings" element={<SettingsPage />} />
             </Route>
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />

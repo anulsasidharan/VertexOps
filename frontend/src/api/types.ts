@@ -82,3 +82,24 @@ export type ExperimentListDto = {
   items: ExperimentDto[];
   total: number;
 };
+
+export type ApiKeyDto = {
+  id: string;
+  label: string | null;
+};
+
+export type ApiKeyCreateResponse = {
+  id: string;
+  label: string | null;
+  raw_key: string;
+};
+
+export type PrepareUploadResponse = {
+  document_id: string;
+  upload_url: string;
+  storage_key: string;
+  storage_uri: string;
+  method: string;
+  headers: Record<string, string>;
+  expires_in: number;
+};
